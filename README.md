@@ -1,5 +1,6 @@
+
 # Introduction
-This Repository contains the RidgeLassoTools Package
+This Repository contains the regmodelsuite Package
 
 # R Package tutorial
 Useful commands in order to create a R package.
@@ -23,5 +24,10 @@ usethis::use_r() # Create a new .R Script within the Package.
 devtools::load_all() # Reload all Scripts within the current session
 devtools::check() # Checks if the package meets the standard requirements
 ```
-4) Docs
-  
+![Alt Text](https://r-pkgs.org/diagrams/install-load.png)
+4) Checking
+Should be done regularly in order to check if the package is still valid.
+```r
+devtools::check() # Runs R CMD check 
+```
+
