@@ -31,3 +31,19 @@ Should be done regularly in order to check if the package is still valid.
 devtools::check() # Runs R CMD check 
 ```
 
+# Function template
+The main function accepts a formula and other parameters 
+```r
+functionWrapper(y ~ x, lambda, cv, data, ...) {
+mframe <- model.frame(formula, data = data)
+
+      # get the model matrix
+      X <- model.matrix(formula, data = data)
+      # get the response variable (lhs of the formula)
+      y <- model.response(mframe)
+}
+```
+the function then extracts the model matrix X and response vector y which then can be passed to other functions for estimation
+```r
+ridge(X, y, lambda) ...
+```
