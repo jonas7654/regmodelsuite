@@ -1,0 +1,3 @@
+plot.LAR <- function(x) {
+
+}

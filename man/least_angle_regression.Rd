@@ -4,7 +4,7 @@
 \alias{least_angle_regression}
 \title{Calculate the LARS path}
 \usage{
-least_angle_regression(X, y, iter = 10)
+least_angle_regression(X, y, iter = 10, verbose = FALSE)
 }
 \arguments{
 \item{X}{data frame containing the covariates}
