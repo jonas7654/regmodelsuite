@@ -1,3 +1,11 @@
+#' Calculate the LARS path
+#'
+#' @param X data frame containing the covariates
+#' @param Y response vector
+#'
+#' @return list ..... TODO
+
+
 
 least_angle_regression <- function(X, y, iter = 10) {
 
