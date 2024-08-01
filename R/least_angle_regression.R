@@ -10,7 +10,8 @@
 # Verbose option
 # plot(...) for plotting L1-arc length
 # step output
-# Lasso option
+# Lasso option !!!!
+# How to select the "best" model? CV? or just provide all models an the user can decide ?
 
 
 least_angle_regression <- function(X, y, iter = 10, verbose = FALSE) {
@@ -58,6 +59,8 @@ least_angle_regression <- function(X, y, iter = 10, verbose = FALSE) {
 
   output_list <- list(coefficients = coefficient_matrix,
                       l1_arc_length = arg_length)
+
+  # Modify S3 class
   class(output_list) <- "LAR"
 
   return (output_list)
