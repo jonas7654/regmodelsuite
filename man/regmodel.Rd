@@ -4,7 +4,7 @@
 \alias{regmodel}
 \title{Wrapper Function for the regmodelsuit package.}
 \usage{
-regmodel(formula = NULL, data = NULL, model = "ridge", lambda = 0, cv = FALSE)
+regmodel(formula = NULL, data = NULL, model = NULL, lambda = 0, cv = FALSE)
 }
 \arguments{
 \item{data}{A data frame which contains the corresponding variables}
