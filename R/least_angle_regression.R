@@ -12,6 +12,7 @@
 # step output
 # Lasso option !!!!
 # How to select the "best" model? CV? or just provide all models an the user can decide ?
+# Include stepsize alpha !!!!!!!!!
 
 
 least_angle_regression <- function(X, y, iter = NULL, verbose = T) {
