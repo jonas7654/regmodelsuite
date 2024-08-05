@@ -27,6 +27,10 @@ least_angle_regression <- function(X, y, iter = NULL, verbose = T) {
 
   # Standardize regressors and initialize the first residuum
   X_scaled <- scale(X)
+  # pre calculate X_scaled for greater efficiency
+  X_scaled_transposed <- t(X_scaled)
+  Xt_X_prod_inverse <- solve(X_scaled_transposed %*% X_scaled)
+
   r <- y - mean(y)
 
   coefficient_matrix <- matrix(NA, nrow = iter, ncol = p)
@@ -41,14 +45,33 @@ least_angle_regression <- function(X, y, iter = NULL, verbose = T) {
     r_cor <- cor(X_scaled, r)
     x_index <- which.max(abs(r_cor))
 
-    # update the active set
+    # update the active set (drop = FALSE in order to keep the class of X)
     active_variables[x_index] <- TRUE
     A <- X_scaled[, active_variables, drop = FALSE]
 
+    # stepsize alpha
+    # B is X_tilde
+    B <- sign(r_cor[x_index]) * A
+    B_transpose <- t(B)
+    Bt_B_prod_inverse <- solve(B_transpose %*% B)
+    ones <- matrix(1, 1 ,ncol(A))
+    ones_tranpose <- t(ones)
+
+    w <- ones %*% Bt_B_prod_inverse %*% ones_tranpose
+    sqrt_w <- as.double(sqrt(w))
+
+    u <- ((B %*% Bt_B_prod_inverse) %*% ones_tranpose) / sqrt_w
+
+    C_max <- X_scaled[x_index] |> as.vector()
+    C_j <- r_cor[-active_variables]
+
+    alpha <- c((C_max - C_j / ((1/sqrt_w) - B_transpose %*% u)),
+               (C_max + C_j) / ((1/sqrt_w) + B_transpose %*% u)) |>
+      min()
 
     # Calculate the current model and update beta
     delta_step <- solve(t(A) %*% A, t(A) %*% r)
-    beta[active_variables] <- beta[active_variables] + delta_step
+    beta[active_variables] <- beta[active_variables] + alpha * delta_step
 
     # update the residual
     r <- y - A %*% as.matrix(beta[active_variables])
