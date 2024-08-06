@@ -65,6 +65,10 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
     results$LAR <- least_angle_regression(X, y)
   }
 
+  if (model == "ridge") {
+    results$ridge <- ridge(X, y, lambda)
+  }
+
 
 
   return(results)
