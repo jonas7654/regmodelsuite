@@ -56,7 +56,16 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
     y <- model.response(mf)
   }
 
-
+  # Data checks
+  stopifnot("X contains invalid entries" = 
+              (is.numeric(X) && !any(is.na(X)) && !any(is.nan(X)) && !any(is.infinite(X)))
+           )
+  stopifnot("y contains invalid entries" = 
+              (is.numeric(y) && !any(is.na(y)) && !any(is.nan(y)) && !any(is.infinite(y)))
+           )
+  stopifnot("Number of rows in X must equal length of y" = 
+              (nrow(X) == length(y))
+           )
 
 
 
