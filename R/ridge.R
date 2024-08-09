@@ -18,7 +18,7 @@
 
 ridge <- function(X,Y, lambda = 0){
   ridge <- .Internal(La_solve(t(X) %*% X + lambda * diag(ncol(X)), t(X) %*% Y, tol = .Machine$double.eps))
-  return(ridge)
+  return(as.vector(ridge))
 }
 
 
