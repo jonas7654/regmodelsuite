@@ -75,7 +75,13 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
   }
 
   if (model == "ridge") {
-    results$ridge <- ridge(X, y, lambda)
+    if(length(lambda)>1){
+      results$ridge <- lapply(lambda, function(lambda){
+        return(ridge(X, y, lambda))
+      })
+    }else{
+      results$ridge <- ridge(X, y, lambda)
+    }
   }
 
 
