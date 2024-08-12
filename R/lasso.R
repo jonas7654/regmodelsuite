@@ -24,6 +24,9 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
   X_scaled <- scale(X, scale = F)
   beta <- double(p)
   max_abs_beta_diff <- Inf
+
+  mean_X_scaled_squared <- colMeans(X_scaled^2)
+
   m <- 0L
 
 
@@ -47,7 +50,7 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
       # 3
       beta_j_next <- ifelse(j == 1, beta_j_tilde,
-                            (1 / (mean(X_scaled[ , j]^2))) *
+                            (1 / mean_X_scaled_squared[ , j]) *
                               sign(beta_j_tilde) *
                               max(0, (abs(beta_j_tilde) - (lambda/2)))
                            )
@@ -60,8 +63,12 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
   }
 
+  # Output section
 
-  lasso_obj <- list(coefficients = beta, iterations = m)
+
+  lasso_obj <- list(coefficients = beta,
+                    iterations = m,
+                    lambda = lambda)
   class(lasso_obj) <- "lasso"
 
   return(lasso_obj)
