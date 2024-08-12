@@ -7,7 +7,6 @@
 
 
 ### TODO ####
-# Verbose option
 # plot(...) for plotting L1-arc length
 # step output
 # Lasso option !!!!
@@ -21,7 +20,7 @@ least_angle_regression <- function(X, y, iter = NULL, verbose = T) {
   p <- ncol(X)
 
   if (is.null(iter)) {
-    # We arrive at the least squares solution after: min(n-1, p)
+    # We arrive at the least squares solution after min(n-1, p) steps
     iter <- min(n - 1, p)
   }
 
@@ -41,8 +40,8 @@ least_angle_regression <- function(X, y, iter = NULL, verbose = T) {
   beta <- double(p)
 
   for (i in 1:iter) {
-    # Find the regressor x most correlated with current r
-    r_cor <- cor(X_scaled, r)
+    # Find the regressor x most correlated with current r (not in)
+    r_cor <- cor(X_scaled, r) # use t(X) %*% r ?
     x_index <- which.max(abs(r_cor))
 
     # update the active set (drop = FALSE in order to keep the class of X)
@@ -51,23 +50,26 @@ least_angle_regression <- function(X, y, iter = NULL, verbose = T) {
 
     # stepsize alpha
     # B is X_tilde
+
     B <- sign(r_cor[x_index]) * A
     B_transpose <- t(B)
     Bt_B_prod_inverse <- solve(B_transpose %*% B)
-    ones <- matrix(1, 1 ,ncol(A))
+    ones <- matrix(1, ncol(A), 1)
     ones_tranpose <- t(ones)
 
-    w <- ones %*% Bt_B_prod_inverse %*% ones_tranpose
+    # calculate w
+    w <- ones_tranpose %*% Bt_B_prod_inverse %*% ones
     sqrt_w <- as.double(sqrt(w))
 
-    u <- ((B %*% Bt_B_prod_inverse) %*% ones_tranpose) / sqrt_w
+    u <- ((B %*% Bt_B_prod_inverse) %*% ones) / sqrt_w
 
-    C_max <- X_scaled[x_index] |> as.vector()
+    C_max <- r_cor[x_index]
     C_j <- r_cor[-active_variables]
 
-    alpha <- c((C_max - C_j / ((1/sqrt_w) - B_transpose %*% u)),
-               (C_max + C_j) / ((1/sqrt_w) + B_transpose %*% u)) |>
-      min()
+    # Take the min
+    alpha_pos <- (C_max - C_j) / ((1 / sqrt_w) - t(X_scaled[, -active_variables]) %*% u)
+    alpha_neg <- (C_max + C_j) / ((1 / sqrt_w) + t(X_scaled[, -active_variables]) %*% u)
+    alpha <- min(c(alpha_pos, alpha_neg)[c(alpha_pos, alpha_neg) > 0])
 
     # Calculate the current model and update beta
     delta_step <- solve(t(A) %*% A, t(A) %*% r)
@@ -75,6 +77,7 @@ least_angle_regression <- function(X, y, iter = NULL, verbose = T) {
 
     # update the residual
     r <- y - A %*% as.matrix(beta[active_variables])
+    #r <- r - A %*% delta_step
 
     ############################################################################
 
@@ -83,6 +86,7 @@ least_angle_regression <- function(X, y, iter = NULL, verbose = T) {
       cat("Iteration:", i, "\n")
       cat("Active Variables:", which(active_variables), "\n")
       cat("delta :", delta_step, "\n")
+      cat("alpha :", alpha, "\n")
       cat("Coefficients:", beta, "\n")
       cat("\n")
     }
