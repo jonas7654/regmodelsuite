@@ -2,24 +2,39 @@
 #'
 #' @param X data frame containing the covariates
 #' @param Y response vector
+#' @param lambda penalty parameter ($\lambda > 0$)
+#' @param tol tolerance level for convergence (default = 1e-5)
 #'
 #' @return list ..... TODO
 
 
-lasso <- function(X, y, lambda,  tol = 1e05) {
+lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
+
+  if (lambda == 0) {
+    OLS <- solve(t(X) %*% X, t(X) %*% y)
+    return(OLS)
+  }
+
 
   n <- nrow(X)
   p <- ncol(X)
-  gamma <- tol
+
 
   # Init
-  X_scaled <- scale(X, center = F)
+  X_scaled <- scale(X, scale = F)
   beta <- double(p)
   max_abs_beta_diff <- Inf
   m <- 0L
 
 
-  while(gamma < max_abs_beta_diff) {
+  while(max_abs_beta_diff > tol) {
+
+    # Only for debugging
+    if(verbose) {
+      cat("Iteration:", m, "\n")
+      cat("beta_diff:", max_abs_beta_diff, "\n")
+    }
+
 
     beta_old <- beta
 
@@ -31,21 +46,22 @@ lasso <- function(X, y, lambda,  tol = 1e05) {
       beta_j_tilde <- mean(X_scaled[ , j] * r)
 
       # 3
-      beta_j_next <- ifelse(j == 0, beta_j_tilde,
+      beta_j_next <- ifelse(j == 1, beta_j_tilde,
                             (1 / (mean(X_scaled[ , j]^2))) *
                               sign(beta_j_tilde) *
-                              (abs(beta_j_tilde) - (lambda/2))
+                              max(0, (abs(beta_j_tilde) - (lambda/2)))
                            )
       beta[j] <- beta_j_next
 
-      # 4
-      m <- m + 1 # unnötig
     }
 
     max_abs_beta_diff <- max(abs(beta - beta_old))
+    m <- m + 1
 
   }
 
-  return(beta)
+
+
+  return(list(coefficients = beta, iterations = m))
 
 }
