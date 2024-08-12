@@ -61,7 +61,9 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
   }
 
 
+  lasso_obj <- list(coefficients = beta, iterations = m)
+  class(lasso_obj) <- "lasso"
 
-  return(list(coefficients = beta, iterations = m))
+  return(lasso_obj)
 
 }

@@ -5,9 +5,10 @@
 #' @param model Specifies the model to be estimated.
 #'   c("ridge","lasso","forward","backward","LAR")
 #' @param lambda penalty parameter for ridge and lasso estimation. If cv = TRUE
-#'   lambda will be ignored All of them are tested to find the optimal lambda
-#'   with regards to the chosen regmodel
-#' @param regmodel Logical value which specifies if cross validation for lambda should be used
+#'   lambda will be ignored all of them are tested to find the optimal lambda
+#'   with regard to the chosen regmodel
+#' @param regmodel Logical value which specifies if cross validation for lambda
+#'   should be used
 #'
 #' @return Model List
 
@@ -24,7 +25,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
               )
            )
   stopifnot("please specify a model \n
-              ridge,
+                                                    ridge,
                                                     lasso,
                                                     forward,
                                                     backward,
@@ -37,9 +38,11 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
                                       )
               )
            )
+
   stopifnot("lambda must be a positiv number" =
               (is.numeric(lambda) && lambda >= 0)
            )
+  stopifnot("")
   stopifnot("cv must be a boolean of length one" =
               (is.logical(cv) && length(cv) == 1)
            )
@@ -60,9 +63,20 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
 
 
 
-
+  # Least angle regression call
   if (model == "LAR") {
     results$LAR <- least_angle_regression(X, y)
+  }
+
+  # Lasso regression call
+  if (model == "lasso") {
+    if (cv) {
+
+    }
+    else {
+      results$lasso <- lasso(X, y, lambda)
+    }
+
   }
 
 
