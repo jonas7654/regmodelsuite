@@ -1,16 +1,19 @@
 #' Wrapper Function for the regmodelsuit package.
 #'
-#' @param formua A formula object which specifies the model
+#' @param formula A formula object which specifies the model
 #' @param data A data frame which contains the corresponding variables
 #' @param model Specifies the model to be estimated.
 #'   c("ridge","lasso","forward","backward","LAR")
 #' @param lambda penalty parameter for ridge and lasso estimation. If cv = TRUE
 #'   lambda will be ignored all of them are tested to find the optimal lambda
 #'   with regard to the chosen regmodel
-#' @param regmodel Logical value which specifies if cross validation for lambda
+#' @param model Logical value which specifies if cross validation for lambda
 #'   should be used
+#'  @param ... Additional parameter for the model. Further information see:
+#'    \link[regmodelsuite]{lasso}
 #'
 #' @return Model List
+#' @export
 
 # TODO
 # Get varibales from parent environment if data = NULL
@@ -18,12 +21,13 @@
 
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
-                     cv = FALSE) {
+                     cv = FALSE, ...) {
   # Input checks
   stopifnot("missing formula object" =
-              (inherits(formula, "formula")
-              )
+              !is.null(formula) || (inherits(formula, "formula")
+                                   )
            )
+
   stopifnot("please specify a model \n
                                                     ridge,
                                                     lasso,
@@ -49,9 +53,6 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
 
   ########################################################################
 
-  # Init
-  results <- list()
-
   # Extract model matrix and response matrix
   if (!is.null(data)) {
     mf <- model.frame(formula, data = data)
@@ -59,6 +60,9 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
     y <- model.response(mf)
   }
 
+  # Init
+  results <- list()
+  names <- names(X)
 
 
 

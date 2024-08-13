@@ -8,12 +8,9 @@
 #' @param lambda A numeric value for the regularization parameter.
 #'
 #' @return A vector of ridge regression coefficients.
-#' 
-#' @example 
-#' set.seed(21)
-#' X <- matrix(runif(100 * 10), 100, 10)
-#' y <- X %*% runif(10, min = -1, max = 1) + rnorm(100, mean = 0, sd = 0.3)
-#' ridge(X,y,0.1)
+#'
+#' @example set.seed(21) X <- matrix(runif(100 * 10), 100, 10) y <- X %*%
+#' runif(10, min = -1, max = 1) + rnorm(100, mean = 0, sd = 0.3) ridge(X,y,0.1)
 
 
 ridge <- function(X,y, lambda = 0){
@@ -26,7 +23,7 @@ ridge <- function(X,y, lambda = 0){
 
 
 #test wie in Richter (am ende entfernen, beispiel von @example):
-set.seed(21) 
+set.seed(21)
 n <- 100
 d <- 10
 o <- 0.3

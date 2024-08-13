@@ -4,21 +4,28 @@
 \alias{regmodel}
 \title{Wrapper Function for the regmodelsuit package.}
 \usage{
-regmodel(formula = NULL, data = NULL, model = NULL, lambda = 0, cv = FALSE)
+regmodel(
+  formula = NULL,
+  data = NULL,
+  model = NULL,
+  lambda = 0,
+  cv = FALSE,
+  ...
+)
 }
 \arguments{
+\item{formula}{A formula object which specifies the model}
+
 \item{data}{A data frame which contains the corresponding variables}
 
-\item{model}{Specifies the model to be estimated.
-c("ridge","lasso","forward","backward","LAR")}
+\item{model}{Logical value which specifies if cross validation for lambda
+should be used
+@param ... Additional parameter for the model. Further information see:
+\link[regmodelsuite]{lasso}}
 
 \item{lambda}{penalty parameter for ridge and lasso estimation. If cv = TRUE
-lambda will be ignored All of them are tested to find the optimal lambda
-with regards to the chosen regmodel}
-
-\item{formua}{A formula object which specifies the model}
-
-\item{regmodel}{Logical value which specifies if cross validation for lambda should be used}
+lambda will be ignored all of them are tested to find the optimal lambda
+with regard to the chosen regmodel}
 }
 \value{
 Model List
