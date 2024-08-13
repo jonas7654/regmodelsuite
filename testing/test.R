@@ -3,6 +3,7 @@
 library(haven)
 library(rstudioapi)
 library(tidyverse)
+library(glmnet)
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 school_data <- read_dta("ca_school_testscore.dta") %>%
@@ -83,13 +84,26 @@ test_data = school_data[-train_rows,]
 reg_equation <- formula(math_score ~ .)
 dim(model.matrix(reg_equation, train_data))
 
-X <- train_data[, -1]
-y <- train_data[, 1]
+### Test with synthetic data ###
+n <- 1000
+p <- 5
+true_beta <- runif(p , min = 0, 10)
+X <- matrix(rnorm(n * p), n, p)
+dimnames(X)[[2]] <- paste0("x",1:p)
+y <- X %*% true_beta + rnorm(n)
 
+dataframe <- data.frame(y = y, X)
 
+# linear model
+sum(abs(lm(y ~ x1 + x2 + x3 + x4 + x5 + 0, data = dataframe)$coefficients - true_beta))
 
-#
+# lasso
+sum(abs(regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "lasso" ,lambda = 0) - true_beta))
+regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "lasso" , lambda = 1)$coefficients
+coef(glmnet(X, y, intercept = F, lambda = 0))
+true_beta
 
-regmodel(reg_equation, data = school_data, lambda = 0.1, model = "lasso", intercept = F) %>% round(. , 3)
+# ridge
+regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "ridge" , lambda = 1)$coefficients
 
 
