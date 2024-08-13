@@ -99,7 +99,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
 
   # Least angle regression call
   if (model == "LAR") {
-    results$LAR <- least_angle_regression(X, y)
+    results <- least_angle_regression(X, y)
   }
 
   # Lasso regression call
