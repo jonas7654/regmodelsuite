@@ -98,12 +98,12 @@ dataframe <- data.frame(y = y, X)
 sum(abs(lm(y ~ x1 + x2 + x3 + x4 + x5 + 0, data = dataframe)$coefficients - true_beta))
 
 # lasso
-sum(abs(regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "lasso" ,lambda = 0) - true_beta))
-regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "lasso" , lambda = 1)$coefficients
+regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "lasso" , lambda = 0)$coefficients
 coef(glmnet(X, y, intercept = F, lambda = 0))
 true_beta
 
 # ridge
-regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "ridge" , lambda = 1)$coefficients
+regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "ridge" , lambda = 1)
+coef(glmnet(X, y, intercept = F, lambda = 1, alpha = 0))
 
 
