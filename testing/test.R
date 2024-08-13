@@ -83,17 +83,13 @@ test_data = school_data[-train_rows,]
 reg_equation <- formula(math_score ~ .)
 dim(model.matrix(reg_equation, train_data))
 
+X <- train_data[, -1]
+y <- train_data[, 1]
 
 
 
 #
 
-regmodel(reg_equation, data = school_data, lambda = 0, model = "lasso", intercept = F) %>% round(. , 7)
+regmodel(reg_equation, data = school_data, lambda = 0.1, model = "lasso", intercept = F) %>% round(. , 3)
 
-X_train <- as.matrix(train_data[, -1])  # Predictors
-y_train <- train_data$math_score  # Response
 
-# Ensure data is numeric
-X_train <- as.numeric(X_train)
-y_train <- as.numeric(y_train)
-lars(X_train, y_train, type = "lar")
