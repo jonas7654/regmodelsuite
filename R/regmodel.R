@@ -82,7 +82,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
     y <- model.response(mf)
   }
 
-  # Option to include the intercept
+  # Option to include the intercept : TODO
   if (intercept) {
     X_scaled <- scale(X)
     y_scaled <- scale(y, scale = FALSE)
@@ -108,7 +108,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
 
     }
     else {
-      results$lasso <- lasso(X, y, lambda, ...)
+      results <- lasso(X, y, lambda)
     }
 
   }

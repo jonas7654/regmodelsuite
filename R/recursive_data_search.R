@@ -8,7 +8,9 @@
 recursive_data_search <- function(data, env) {
 
   if (exists(data, env)) {
-    cat("Variable", data, "retrieved from:", environmentName(.GlobalEnv), "\n")
+    cat("Variable", data, "retrieved from: ")
+    print(env)
+    cat("\n")
     return(get(data, envir = env))
   }
 
