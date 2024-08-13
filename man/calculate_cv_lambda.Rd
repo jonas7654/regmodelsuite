@@ -10,19 +10,24 @@ calculate_cv_lambda(M, X, Y, lambda, regmodel = ridge)
 \item{M}{Split X into M-many equally sized Groups.
 M = 5 or M = 10 is recommended.}
 
-\item{X}{Dataset X has the class "tibble".}
+\item{X}{Dataset X has the class "matrix".}
 
-\item{Y}{Dataset Y has the class "tibble".}
+\item{Y}{Target variable Y has the class "matrix".}
 
 \item{lambda}{Lambda is an atomic vector of double values.
-All of them are tested to find the optimal lambda with regards to the chosen
-regmodel}
+cross_validation will find the optimal lambda with regards to the chosen
+regression model.}
 
-\item{regmodel}{Regressionmodel that is used on X and Y. Options are:
-ridge and lasso}
+\item{regmodel}{Regression model that is used on the data during Cross Validation.
+Options are:
+\itemize{
+\item ridge
+\item lasso
+}}
 }
 \value{
-A double value
+A list with the mean squared prediction error, the optimal lambda and
+the coefficients of the chosen regression model with the optimal lambda.
 }
 \description{
 Calculates the Lambda with M-fold Cross Validation
