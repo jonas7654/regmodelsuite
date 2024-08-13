@@ -16,7 +16,6 @@
 #' @export
 
 # TODO
-# Get varibales from parent environment if data = NULL
 # Add option to remove or include intercept ?
 
 
@@ -46,9 +45,11 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
   stopifnot("lambda must be a positiv number" =
               (is.numeric(lambda) && lambda >= 0)
            )
-  stopifnot("")
   stopifnot("cv must be a boolean of length one" =
               (is.logical(cv) && length(cv) == 1)
+           )
+  stopifnot("data must be NULL or a data frame" =
+              is.null(data) || is.data.frame(data)
            )
 
   ########################################################################
@@ -60,9 +61,32 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
     y <- model.response(mf)
   }
 
+  else if (is.null(data)) {
+    var_names <- all.vars(formula)
+    data <- sapply(var_names, function(names) {
+                                   recursive_data_search(names, parent.frame())
+      })
+
+    data <- as.data.frame(data)
+
+    # Check that all variables were collected
+    if (ncol(data) != length(var_names)) {
+      stop("Couldn't find all variables")
+    }
+
+    names(data) <- var_names
+
+    # Create model frame
+    mf <- model.frame(formula, data = data)
+    X <- model.matrix(formula, data = data)
+    y <- model.response(mf)
+  }
+
   # Init
   results <- list()
-  names <- names(X)
+
+  # extract column names
+  var_names <- dimnames(X)[[2]]
 
 
 
