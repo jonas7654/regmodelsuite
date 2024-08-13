@@ -20,7 +20,7 @@
 
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
-                     cv = FALSE, ...) {
+                     cv = FALSE, intercept = FALSE , ...) {
   # Input checks
   stopifnot("missing formula object" =
               !is.null(formula) || (inherits(formula, "formula")
@@ -82,6 +82,12 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
     y <- model.response(mf)
   }
 
+  # Option to include the intercept
+  if (intercept) {
+    X_scaled <- scale(X)
+    y_scaled <- scale(y, scale = FALSE)
+  }
+
   # Init
   results <- list()
 
@@ -102,7 +108,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
 
     }
     else {
-      results$lasso <- lasso(X, y, lambda)
+      results$lasso <- lasso(X, y, lambda, ...)
     }
 
   }

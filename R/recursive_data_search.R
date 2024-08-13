@@ -1,6 +1,4 @@
-#' S3 plot function for lasso
-#' Recursively searches for the specified data object. The last environment
-#' is the globalenv
+#' Recursively search parent environments for data
 #'
 #'
 #' @param data Name of data object
