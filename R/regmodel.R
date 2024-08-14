@@ -23,6 +23,8 @@
 # Better output on return object. Maybe implement summary?
 # Compute standardized X and y in regmodel or in estimation functions?
 # names(fit$coefficients) <- var_names_x at the end of the function? Requires identical output between functions
+# include r-squared into output via calculate_R2...
+# Possibility to use own lambda grid for CV
 
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
@@ -118,7 +120,12 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
   if (model == "lasso") {
     if (cv) {
       cv_results <- lasso_cv(X, y, m = 10, nridge = 100)
+      lambda <- cv_results$min_lambda
+      fit <- lasso(X, y, lambda)
+      names(fit$coefficients) <- var_names_x
 
+      cvLasso <- list(fit = fit, cv = cv_results)
+      results <- cvLasso
     }
     else {
       fit <- lasso(X, y, lambda)

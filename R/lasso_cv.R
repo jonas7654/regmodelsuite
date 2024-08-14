@@ -138,7 +138,7 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
 
   }
 
-   MSPE_cv= colMeans(mspe_matrix)
+   MSPE_cv = colMeans(mspe_matrix)
    min_lambda_index <- which.min(MSPE_cv)
 
    min_lambda = lambda[min_lambda_index]
@@ -146,6 +146,7 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
    returnList <- list(nridge = nridge,
                       lambda_grid= lambda,
                       min_lambda = min_lambda,
-                      m_folds = m)
+                      m_folds = m,
+                      MSPE = MSPE_cv)
    return(returnList)
 }

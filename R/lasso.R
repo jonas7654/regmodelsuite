@@ -69,6 +69,7 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
   # Output section
 
 
+
   lasso_obj <- list(coefficients = round(beta, 6),
                     iterations = m,
                     lambda = lambda)
