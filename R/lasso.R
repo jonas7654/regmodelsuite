@@ -11,8 +11,11 @@
 lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
   if (lambda == 0) {
-    OLS <- solve(t(X) %*% X, t(X) %*% y)
-    return(OLS)
+    OLS <- lm.fit(X, y)$coefficients # solve(t(X) %*% X, t(X) %*% y)
+    if (ncol(X) >= nrow(X)) {
+      warning("The matrix X suffers from multicollinearity")
+    }
+    return(list(coefficients = OLS))
   }
 
 
@@ -50,7 +53,7 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
       # 3
       beta_j_next <- ifelse(j == 1, beta_j_tilde,
-                            (1 / mean_X_scaled_squared[ , j]) *
+                            (1 / mean_X_scaled_squared[j]) *
                               sign(beta_j_tilde) *
                               max(0, (abs(beta_j_tilde) - (lambda/2)))
                            )
@@ -66,7 +69,7 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
   # Output section
 
 
-  lasso_obj <- list(coefficients = beta,
+  lasso_obj <- list(coefficients = round(beta, 6),
                     iterations = m,
                     lambda = lambda)
   class(lasso_obj) <- "lasso"

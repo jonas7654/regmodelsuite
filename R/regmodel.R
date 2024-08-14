@@ -17,6 +17,10 @@
 
 # TODO
 # Add option to remove or include intercept ?
+# Identical return lists for each function
+# Add X and y variable to return list in order to call predict efficiently
+# Plots
+# Better output on return object. Maybe implement summary?
 
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
@@ -51,17 +55,15 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
   stopifnot("data must be NULL or a data frame" =
               is.null(data) || is.data.frame(data)
            )
+  stopifnot("Intercept must be TRUE or FALSE" =
+              is.logical(intercept)
+           )
 
   ########################################################################
 
-  # Extract model matrix and response matrix
-  if (!is.null(data)) {
-    mf <- model.frame(formula, data = data)
-    X <- model.matrix(formula, data = data)
-    y <- model.response(mf)
-  }
 
-  else if (is.null(data)) {
+  # Extract data from parent environments up until the globalenv
+  if (is.null(data)) {
     var_names <- all.vars(formula)
     data <- sapply(var_names, function(names) {
                                    recursive_data_search(names, parent.frame())
@@ -75,31 +77,39 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
     }
 
     names(data) <- var_names
-
-    # Create model frame
-    mf <- model.frame(formula, data = data)
-    X <- model.matrix(formula, data = data)
-    y <- model.response(mf)
   }
 
-  # Option to include the intercept : TODO
-  if (intercept) {
-    X_scaled <- scale(X)
-    y_scaled <- scale(y, scale = FALSE)
+  # Intercept handling
+  if (!intercept) {
+    # remove the intercept (base case)
+    t <- terms(formula, data = data)
+    formula <- update.formula(formula(t), ~ . + 0)
   }
+
+  # Create model frame
+  mf <- model.frame(formula, data = data)
+  X <- model.matrix(formula, data = data)
+  y <- model.response(mf)
+
+
 
   # Init
   results <- list()
 
   # extract column names
-  var_names <- dimnames(X)[[2]]
+  var_names_x <- dimnames(X)[[2]]
+  names(X) <- var_names_x
 
-
-
+  # Ridge call
+  if (model == "ridge") {
+    results <- ridge(X, y, lambda)
+  }
 
   # Least angle regression call
   if (model == "LAR") {
-    results <- least_angle_regression(X, y)
+    fit <- least_angle_regression(X, y)
+    names(fit$coefficients) <- var_names_x
+    results <- fit
   }
 
   # Lasso regression call
@@ -108,7 +118,9 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
 
     }
     else {
-      results <- lasso(X, y, lambda)
+      fit <- lasso(X, y, lambda)
+      names(fit$coefficients) <- var_names_x
+      results <- fit
     }
 
   }
