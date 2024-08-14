@@ -4,9 +4,10 @@ ridge_plots <- function(X,y,m){
 }
 
 ridge_plot <- function(X,y,m){
-  cv_line <- X %*% ridge(X,y,cv.ridge(X,y,m))
+  cv_line <- X %*% ridge(X,y,cross_validation(X,y,m)$cv.lambda)
   plot(X[,1], y, main="Ridge-Schätzer", xlab="x1", ylab="y", pch=19, col="blue")
-  lines(X[,1], cv_line, col="red", lwd=2)
+  lines(X[order(X[,1])], cv_line[order(X[,1])], col="red", lwd=2)
+  #lines(X[,1], cv_line, col="red", lwd=2)
 }
 
 ridge_plot_profile_lines <- function(X,y,m){
@@ -16,14 +17,14 @@ ridge_plot_profile_lines <- function(X,y,m){
     lambda <- lambda_seq[i]
     ridge_seq[, i] <- ridge(X, y, lambda)
   }
-  
+
   matplot(lambda_seq, t(ridge_seq),
           type = "l", lty = 1, col = 1:ncol(ridge_seq),
-          xlab = "lambda", ylab = "geschätzte Parameter beta", 
+          xlab = "lambda", ylab = "geschätzte Parameter beta",
           main = "Ridge-Schätzer: Profillinien der Parameter", log = "x", xaxt = "n"
   )
-  
+
   axis(1, at = c(1e-3, 1e-1, 1e1, 1e3), labels = c("1e-3", "1e-1", "1e1", "1e3"))
-  
-  abline(v = cv.ridge(X,y,m), col = "black", lty = 2)
+
+  abline(v = cross_validation(X,y,m)$cv.lambda, col = "black", lty = 2)
 }
