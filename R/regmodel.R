@@ -22,6 +22,7 @@
 # Plots
 # Better output on return object. Maybe implement summary?
 # Compute standardized X and y in regmodel or in estimation functions?
+# names(fit$coefficients) <- var_names_x at the end of the function? Requires identical output between functions
 
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
@@ -116,6 +117,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,
   # Lasso regression call
   if (model == "lasso") {
     if (cv) {
+      cv_results <- lasso_cv(X, y, m = 10, nridge = 100)
 
     }
     else {
