@@ -85,35 +85,36 @@ reg_equation <- formula(math_score ~ .)
 dim(model.matrix(reg_equation, train_data))
 
 
+##########################################################################
+if(!requireNamespace("tm", quietly = TRUE)) {
+  install.packages("tm")
+}
+library(tm)
 
+# Example text corpus (small for demonstration)
+texts <- c("Text mining is fun", "R is great for text analysis", "High-dimensional data can be challenging")
+corpus <- Corpus(VectorSource(texts))
+# Convert to lowercase
+corpus <- tm_map(corpus, content_transformer(tolower))
 
-### Test with synthetic data ###
-n <- 1000
-p <- 10
-true_beta <- runif(p , min = 0, 10)
-X <- matrix(rnorm(n * p), n, p)
-dimnames(X)[[2]] <- paste0("x",1:p)
-y <- X %*% true_beta + rnorm(n)
+# Remove punctuation
+corpus <- tm_map(corpus, removePunctuation)
 
-model_formula <- formula(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10)
+# Remove stopwords (like 'the', 'and', etc.)
+corpus <- tm_map(corpus, removeWords, stopwords("english"))
 
-dataframe <- data.frame(y = y, X)
+# Convert to Document-Term Matrix (DTM)
+dtm <- DocumentTermMatrix(corpus, control = list(weighting = weightTfIdf))
 
-# linear model
-lm(model_formula, data = dataframe) #With intercept
+# Convert to matrix
+X <- as.matrix(dtm)
 
-# lasso with lambda = 0 => OLS
-regmodel(model_formula, data = dataframe, model = "lasso" , lambda = 0)
-coef(glmnet(X, y, intercept = F, lambda = 0))
+# Simulate a response variable
+y <- rnorm(nrow(X))
 
-# least angle
-least_angle_regression(X, y, T)
-coef(lars(X, y, type = "lar"))
+# Convert to data frame
+dataframe <- as.data.frame(cbind(y, X))
 
-true_beta
-
-# ridge
-regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "ridge" , lambda = 1)
-coef(glmnet(X, y, intercept = F, lambda = 1, alpha = 0))
-
+# Create a formula for the model
+model_formula <- formula(paste("y ~", paste(colnames(X), collapse = " + ")))
 

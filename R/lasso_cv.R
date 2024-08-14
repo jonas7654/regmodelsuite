@@ -17,6 +17,15 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
   m <- 0L
 
   lasso_only_lambda <- function(lambda) {
+
+    if (lambda == 0) {
+      OLS <- lm.fit(X, y)$coefficients
+      if (ncol(X) >= nrow(X)) {
+        warning("The matrix X suffers from multicollinearity")
+      }
+      return(as.vector(OLS))
+    }
+
     beta <- double(p)
 
     while(max_abs_beta_diff > tol) {
@@ -44,6 +53,7 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
       m <- m + 1
 
     }
+    return(as.vector(beta))
   }
 
   return(lasso_only_lambda)
@@ -57,10 +67,11 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
   folds <- cut(seq(1,nrow(X)),breaks=m,labels=FALSE)
 
   n <- nrow(X)
+  p <- ncol(X)
 
   lambda_min <- rep(0,m)
 
-  beta <- matrix(nrow = m, ncol = nridge)
+  beta <- matrix(nrow = p, ncol = nridge)
   mspe_matrix <- matrix(nrow = m, ncol = nridge)
 
 
@@ -78,7 +89,7 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
   ridge_rat_vec = exp(log_ridge_rat_vec)
 
   # scale by sample size n
-  lambda = ridge_rat_vec * n
+  lambda = ridge_rat_vec * nridge
 
 
   # Perform m-fold cross validation
@@ -113,21 +124,21 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
     y_mean = attr(y_reg, "scaled:center")
 
     # Scale the out of sample X by the mean and sd of the training data X
-    train_data_scaled <- (train_data - x_mean) / x_sd
+    test_data_scaled <- (testData - x_mean) / x_sd
 
     # This is a n x nridge matrix
     out_of_sample_predicted_y <- apply(beta, 2, function(beta) {
-      y_mean + train_data_scaled %*% beta
+      y_mean + test_data_scaled %*% beta
     })
 
     # Calculate prediction error
     mspe_matrix[i , ] <- apply(out_of_sample_predicted_y, 2, function(pred) {
-      mean((out_of_sample_predicted_y - ytestData)^2)
+      mean((pred - ytestData)^2)
     })
 
-    }
+  }
 
-   MSPE_cv= colMeans(MSPE_RIDGE)
+   MSPE_cv= colMeans(mspe_matrix)
    min_lambda_index <- which.min(MSPE_cv)
 
    min_lambda = lambda[min_lambda_index]
