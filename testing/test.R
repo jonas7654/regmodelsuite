@@ -84,26 +84,37 @@ test_data = school_data[-train_rows,]
 reg_equation <- formula(math_score ~ .)
 dim(model.matrix(reg_equation, train_data))
 
-### Test with synthetic data ###
-n <- 1000
-p <- 5
-true_beta <- runif(p , min = 0, 10)
-X <- matrix(rnorm(n * p), n, p)
-dimnames(X)[[2]] <- paste0("x",1:p)
-y <- X %*% true_beta + rnorm(n)
 
-dataframe <- data.frame(y = y, X)
+##########################################################################
+if(!requireNamespace("tm", quietly = TRUE)) {
+  install.packages("tm")
+}
+library(tm)
 
-# linear model
-sum(abs(lm(y ~ x1 + x2 + x3 + x4 + x5 + 0, data = dataframe)$coefficients - true_beta))
+# Example text corpus (small for demonstration)
+texts <- c("Text mining is fun", "R is great for text analysis", "High-dimensional data can be challenging")
+corpus <- Corpus(VectorSource(texts))
+# Convert to lowercase
+corpus <- tm_map(corpus, content_transformer(tolower))
 
-# lasso
-regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "lasso" , lambda = 0)$coefficients
-coef(glmnet(X, y, intercept = F, lambda = 0))
-true_beta
+# Remove punctuation
+corpus <- tm_map(corpus, removePunctuation)
 
-# ridge
-regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "ridge" , lambda = 1)
-coef(glmnet(X, y, intercept = F, lambda = 1, alpha = 0))
+# Remove stopwords (like 'the', 'and', etc.)
+corpus <- tm_map(corpus, removeWords, stopwords("english"))
 
+# Convert to Document-Term Matrix (DTM)
+dtm <- DocumentTermMatrix(corpus, control = list(weighting = weightTfIdf))
+
+# Convert to matrix
+X <- as.matrix(dtm)
+
+# Simulate a response variable
+y <- rnorm(nrow(X))
+
+# Convert to data frame
+dataframe <- as.data.frame(cbind(y, X))
+
+# Create a formula for the model
+model_formula <- formula(paste("y ~", paste(colnames(X), collapse = " + ")))
 

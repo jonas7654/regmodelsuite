@@ -8,10 +8,7 @@
 
 ### TODO ####
 # plot(...) for plotting L1-arc length
-# step output
-# Lasso option !!!!
-# How to select the "best" model? CV? or just provide all models an the user can decide ?
-# Include stepsize alpha !!!!!!!!!
+
 
 
 least_angle_regression <- function(X, y, verbose = F) {
@@ -58,7 +55,6 @@ least_angle_regression <- function(X, y, verbose = F) {
     # calculate step size
     B <- t(X_scaled) %*% u
 
-    # Handle the special case
     if (i == max_iter) {
       alpha <- C_max * sqrt_w
     }
