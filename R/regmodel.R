@@ -21,6 +21,7 @@
 # Add X and y variable to return list in order to call predict efficiently
 # Plots
 # Better output on return object. Maybe implement summary?
+# Compute standardized X and y in regmodel or in estimation functions?
 
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = 0,

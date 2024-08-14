@@ -146,6 +146,6 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
    returnList <- list(nridge = nridge,
                       lambda_grid= lambda,
                       min_lambda = min_lambda,
-                      n_folds = m)
+                      m_folds = m)
    return(returnList)
 }
