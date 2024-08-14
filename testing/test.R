@@ -84,22 +84,32 @@ test_data = school_data[-train_rows,]
 reg_equation <- formula(math_score ~ .)
 dim(model.matrix(reg_equation, train_data))
 
+
+
+
 ### Test with synthetic data ###
 n <- 1000
-p <- 5
+p <- 10
 true_beta <- runif(p , min = 0, 10)
 X <- matrix(rnorm(n * p), n, p)
 dimnames(X)[[2]] <- paste0("x",1:p)
 y <- X %*% true_beta + rnorm(n)
 
+model_formula <- formula(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10)
+
 dataframe <- data.frame(y = y, X)
 
 # linear model
-sum(abs(lm(y ~ x1 + x2 + x3 + x4 + x5 + 0, data = dataframe)$coefficients - true_beta))
+lm(model_formula, data = dataframe) #With intercept
 
-# lasso
-regmodel(y ~ x1 + x2 + x3 + x4 + x5, data = dataframe, model = "lasso" , lambda = 0)$coefficients
+# lasso with lambda = 0 => OLS
+regmodel(model_formula, data = dataframe, model = "lasso" , lambda = 0)
 coef(glmnet(X, y, intercept = F, lambda = 0))
+
+# least angle
+least_angle_regression(X, y, T)
+coef(lars(X, y, type = "lar"))
+
 true_beta
 
 # ridge
