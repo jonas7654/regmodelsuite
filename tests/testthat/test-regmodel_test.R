@@ -90,6 +90,8 @@ test_that("missing data is handled", {
   df_with_na_predictors[1:10, "x1"] <- NA
   df_with_na_predictors[20:30, "x2"] <- NA
 
+  count_missing <- sum(!complete.cases(df_with_na_predictors))
+
   # Define formula
   formula <- as.formula(y ~ x1 + x2 + as.factor(categorical))
 
