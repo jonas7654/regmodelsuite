@@ -18,7 +18,7 @@ data <- data.frame(y, X1 = X[, 1], X2 = X[, 2], X3 = X[, 3], X4 = X[, 4], X5 = X
 
 # Write tests
 
-test_that("regmodel works with ridge regression", {
+test_that("regmodel input checks work", {
   formula <- y ~ X1 + X2 + X3 + X4 + X5
   lambda <- 1
 
@@ -50,4 +50,7 @@ test_that("regmodel works with ridge regression", {
                "couldn't find all variables in data frame")
   # Find variables in environment
   expect_no_error(regmodel(formula = y ~ x1 , model = "lasso", lambda = 1))
+  expect_error(regmodel(formula = y ~ . , model = "lasso", lambda = 1))
+
+
 })
