@@ -83,6 +83,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   # Init
   results <- list()
+  call <- getc
 
   # extract column names
   var_names_x <- dimnames(X)[[2]]
@@ -90,7 +91,11 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   # Ridge call
   if (model == "ridge") {
-    results <- ridge(X, y, lambda)
+    fit <- ridge(X, y, lambda)
+    # Add corresponding variable names to output
+    names(fit$coefficients) <- var_names_x
+
+    results <- fit
   }
 
   # Least angle regression call

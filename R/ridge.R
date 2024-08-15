@@ -14,8 +14,28 @@
 
 
 ridge <- function(X,y, lambda = 0){
-  ridge <- .Internal(La_solve(t(X) %*% X + lambda * diag(ncol(X)), t(X) %*% y, tol = .Machine$double.eps))
-  return(as.vector(ridge))
+
+  # standardize coefficients
+  y_demeaned <- scale(y, scale = F)
+  X_scaled <- scale(X)
+  X_scaled_transposed <- t(X_scaled)
+
+  ridge_coefficients <- solve(X_scaled_transposed %*% X_scaled + lambda * diag(ncol(X)),
+                              X_scaled_transposed %*% y_demeaned)
+
+  result <-list(coefficients = as.vector(ridge_coefficients),
+                lambda = lambda,
+                y = y,
+                mean_y = attr(y_demeaned, "scaled:center"), # for rescaling when predicting
+                mean_x = attr(X_scaled, "scaled:center"), # for rescaling when predicting
+                sd_x = attr(X_scaled, "scaled:scale"), # for rescaling when predicting
+                model = X,
+                n = nrow(X),
+                p = ncol(X))
+
+  class(result) <- "ridge"
+
+  return(result)
 }
 
 
