@@ -29,44 +29,25 @@
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
                      cv = FALSE, intercept = FALSE , ...) {
+
   # Input checks
-  stopifnot("missing formula object" =
-              !is.null(formula) || (inherits(formula, "formula")
-                                   )
-           )
+  stopifnot(!is.null(formula) && inherits(formula, "formula"))
 
-  stopifnot("please specify a model \n
-                                                    ridge,
-                                                    lasso,
-                                                    forward,
-                                                    backward,
-                                                    LAR            " =
-              (is.character(model) && (model %in% c("ridge",
-                                                    "lasso",
-                                                    "forward",
-                                                    "backward",
-                                                    "LAR")
-                                      )
-              )
-           )
+  valid_models <- c("ridge", "lasso", "forward", "backward", "LAR")
+  stopifnot(is.character(model) && model %in% valid_models)
 
-  stopifnot("lambda must be a positiv number" =
-              (is.numeric(lambda) & lambda >= 0)
-           )
-  if(cv && !is.null(lambda)) {
-    stopifnot("lambda must be a vector > 1 in order to perform cross validation" =
-              (length(lambda) > 1)
-             )
+  if (model %in% c("ridge", "lasso")) {
+    if (is.null(lambda)) {
+      stop("Please specify a lambda >= 0")
+    }
+    if (cv && length(lambda) <= 1) {
+      stop("For cross-validation, lambda must be a vector of length greater than 1")
+    }
   }
-  stopifnot("cv must be a boolean of length one" =
-              (is.logical(cv) && length(cv) == 1)
-           )
-  stopifnot("data must be NULL or a data frame" =
-              is.null(data) || is.data.frame(data)
-           )
-  stopifnot("Intercept must be TRUE or FALSE" =
-              is.logical(intercept)
-           )
+
+  stopifnot(is.logical(cv) && length(cv) == 1)
+  stopifnot(is.null(data) || is.data.frame(data))
+  stopifnot(is.logical(intercept) && length(intercept) == 1)
 
   ########################################################################
 
