@@ -9,8 +9,6 @@
 #'   with regard to the chosen regmodel
 #' @param model Logical value which specifies if cross validation for lambda
 #'   should be used
-#'  @param ... Additional parameter for the model. Further information see:
-#'    \link[regmodelsuite]{lasso}
 #'
 #' @return Model List
 #' @export
@@ -27,35 +25,56 @@
 # explain lambda grid
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
-                     cv = FALSE, intercept = FALSE , ...) {
+                     cv = FALSE, ...) {
 
   # Input checks
-  stopifnot(!is.null(formula) && inherits(formula, "formula"))
+  stopifnot("please provide a valid formula object" =
+              !is.null(formula) && inherits(formula, "formula")
+           )
+  stopifnot("cv must be length 1 logical value " = (is.logical(cv)) && (length(cv) == 1)
+           )
 
   valid_models <- c("ridge", "lasso", "forward", "backward", "LAR")
-  stopifnot(is.character(model) && model %in% valid_models)
+  stopifnot("Please select a valid model" =
+              is.character(model) && model %in% valid_models)
 
   if (model %in% c("ridge", "lasso")) {
-    if (!cv && is.null(lambda)) {
-      stop("Please specify a lambda >= 0")
+    if (!cv) {
+      if (is.null(lambda)) {
+        stop("Please specify a lambda >= 0")
+      }
+      if (!is.numeric(lambda)  || lambda < 0 || length(lambda) != 1) {
+        stop("Lambda must be a positive number")
+      }
     }
+    # If cv is TRUE
+    else {
+      if(!is.null(lambda)) {
+        stopifnot("lambda values must be positive" = all(lambda > 0))
+      }
+    }
+}
+
+  if (!is.null(data)) {
+    stopifnot("data must be of type data.frame" = is.data.frame(data))
   }
 
-  stopifnot(is.logical(cv) && length(cv) == 1)
-  stopifnot(is.null(data) || is.data.frame(data))
-  stopifnot(is.logical(intercept) && length(intercept) == 1)
+
+
+
+
 
   ########################################################################
 
 
   # Extract data from parent environments up until the globalenv
+  var_names <- all.vars(formula)
   if (is.null(data)) {
-    var_names <- all.vars(formula)
     data <- sapply(var_names, function(names) {
                                    recursive_data_search(names, parent.frame())
       })
 
-    data <- as.data.frame(data)
+    data <- as.data.frame(as.matrix(data))
 
     # Check that all variables were collected
     if (ncol(data) != length(var_names)) {
@@ -65,18 +84,31 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     names(data) <- var_names
   }
 
-  # Intercept handling
-  if (!intercept) {
-    # remove the intercept (base case)
-    t <- terms(formula, data = data)
-    formula <- update.formula(formula(t), ~ . + 0)
+
+  ### Handle missing values ###
+
+  # Find complete rows and drop NA rows
+  complete_rows <- complete.cases(data)
+  if (sum(complete_rows) == 0) {
+    stop("The dataframe has  only missing values")
   }
+  if (sum(!complete_rows) > 0) {
+    warning(paste(sum(!complete_rows), "rows with missing values"))
+  }
+  data <- data[complete_rows , ]
+
+
 
   # Create model frame
   mf <- model.frame(formula, data = data)
-  X <- model.matrix(formula, data = data)
+  X <- model.matrix(formula, data = data)[ , -1] # removed intercept
   y <- model.response(mf)
 
+  # Edge case if X contains only one variable
+  if (is.null(dim(X))) {
+    X <- as.matrix(X)
+    dim(X) <- c(length(X), 1)
+  }
 
 
 
@@ -86,7 +118,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   # extract column names
   var_names_x <- dimnames(X)[[2]]
-  names(X) <- var_names_x
+  colnames(X) <- var_names_x
 
   # Ridge call
   if (model == "ridge") {
@@ -107,12 +139,13 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   # Lasso regression call
   if (model == "lasso") {
     if (cv) {
-      if (length(lambda > 1)) {
-        cv_results <- lasso_cv(X, y, m = 10, lambda = lambda)
+      if (length(lambda) > 1 ) {
+        cv_results <- lasso_cv(X, y, m = 10, nridge = length(lambda), lambda = lambda)
         results <- cv_results
       }
       else {
-        cv_results <- lasso_cv(X, y, m = 10, nridge = 100)
+        cv_results <- lasso(X, y, lambda)
+        warning("no cross validation was performed")
         results <- cv_results
       }
     }
@@ -122,6 +155,16 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
       results <- fit
     }
 
+  }
+
+
+  if (model %in% c("forward", "backward")) {
+    if (model == "forward") {
+      # TODO
+    }
+    else if (model == "backward") {
+      # TODO
+    }
   }
 
   # Add function call to results

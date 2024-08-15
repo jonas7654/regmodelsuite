@@ -2,7 +2,7 @@
 #'
 #'
 #' @param data Name of data object
-#' @param env current environment for recrusive search
+#' @param env current environment for recursive search
 #'
 
 recursive_data_search <- function(data, env) {

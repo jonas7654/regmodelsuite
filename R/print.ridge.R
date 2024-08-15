@@ -11,4 +11,5 @@ print.ridge <- function(ridgeobj) {
   cat("Lambda: ", ridgeobj$lambda, "\n", sep = " ")
   cat("Coefficients:\n")
   print(ridgeobj$coefficients)
+  cat("R2:", ridgeobj$R2, "\n")
 }
