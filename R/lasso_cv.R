@@ -61,7 +61,7 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
 
 
-lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
+lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100 , lambda = NULL) {
 
   # Create m folds
   folds <- cut(seq(1,nrow(X)),breaks=m,labels=FALSE)
@@ -71,25 +71,31 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
 
   lambda_min <- rep(0,m)
 
+  if (!is.null(lambda)) {
+    nridge = length(lambda)
+  }
+
   beta <- matrix(nrow = p, ncol = nridge)
   mspe_matrix <- matrix(nrow = m, ncol = nridge)
 
 
 
-  # specify a lambda grid. log transformation to favour smaller values
-  ridge_rat_max = 50
-  ridge_rat_min = 0.002
+  if(is.null(lambda)) {
+    # specify a lambda grid. log transformation to favour smaller values
+    ridge_rat_max = 50
+    ridge_rat_min = 0.002
 
-  log_min = log(ridge_rat_min)
-  log_max = log(ridge_rat_max)
+    log_min = log(ridge_rat_min)
+    log_max = log(ridge_rat_max)
 
-  step = (log_max-log_min)/(nridge-1)
+    step = (log_max-log_min)/(nridge-1)
 
-  log_ridge_rat_vec = seq(log_min,log_max,by = step)
-  ridge_rat_vec = exp(log_ridge_rat_vec)
+    log_ridge_rat_vec = seq(log_min,log_max,by = step)
+    ridge_rat_vec = exp(log_ridge_rat_vec)
 
-  # scale by sample size n
-  lambda = ridge_rat_vec * nridge
+
+    lambda = ridge_rat_vec * nridge
+  }
 
 
   # Perform m-fold cross validation
@@ -116,11 +122,8 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
     }
 
     # calculate predicted values on original scale
-    # Get mean and sd from the training data X
     x_mean <- attr(x_reg, "scaled:center")
     x_sd <- attr(x_reg, "scaled:scale")
-
-    # Get mean of training data y
     y_mean = attr(y_reg, "scaled:center")
 
     # Scale the out of sample X by the mean and sd of the training data X
@@ -144,7 +147,7 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
    min_lambda = lambda[min_lambda_index]
 
    returnList <- list(nridge = nridge,
-                      lambda_grid= lambda,
+                      lambda_grid = lambda,
                       min_lambda = min_lambda,
                       m_folds = m,
                       MSPE = MSPE_cv)

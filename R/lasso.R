@@ -68,11 +68,16 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
   # Output section
 
+  beta <- round(beta, 6)
+  coef_active <- names(beta[beta > 0])
+  coef_inactive <- names(beta[beta == 0])
 
-
-  lasso_obj <- list(coefficients = round(beta, 6),
+  lasso_obj <- list(coefficients = beta,
+                    active_variables = coef_active,
+                    inactive_variables = coef_inactive,
                     iterations = m,
                     lambda = lambda)
+
   class(lasso_obj) <- "lasso"
 
   return(lasso_obj)

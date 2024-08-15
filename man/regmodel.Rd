@@ -10,6 +10,7 @@ regmodel(
   model = NULL,
   lambda = 0,
   cv = FALSE,
+  intercept = FALSE,
   ...
 )
 }

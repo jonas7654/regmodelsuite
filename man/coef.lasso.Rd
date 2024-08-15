@@ -4,7 +4,7 @@
 \alias{coef.lasso}
 \title{S3 plot function for lasso}
 \usage{
-\method{coef}{lasso}(lasso)
+\method{coef}{lasso}(regobject)
 }
 \arguments{
 \item{lasso}{A lasso S3 Object}
