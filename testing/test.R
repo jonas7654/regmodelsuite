@@ -82,8 +82,9 @@ train_data = school_data[train_rows,]
 test_data = school_data[-train_rows,]
 
 # Large model with all variables, squared variables and cubic variables as well as all interactions
-reg_equation <- formula(math_score ~ .)
+reg_equation <- formula(math_score ~ .*.)
 dim(model.matrix(reg_equation, train_data))
 
 
-
+fit <-regmodel(reg_equation, data = train_data, model = "lasso", lambda = c(1,2,3,4,5), cv = T)
+print.ridge(fit)

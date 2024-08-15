@@ -24,7 +24,6 @@
 # Compute standardized X and y in regmodel or in estimation functions?
 # names(fit$coefficients) <- var_names_x at the end of the function? Requires identical output between functions
 # include r-squared into output via calculate_R2...
-# Possibility to use own lambda grid for CV
 # explain lambda grid
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,

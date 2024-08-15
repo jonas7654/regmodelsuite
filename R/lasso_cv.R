@@ -64,7 +64,7 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100 , lambda = NULL) {
 
   # Create m folds
-  folds <- cut(seq(1,nrow(X)),breaks=m,labels=FALSE)
+  folds <- cut(seq(1,nrow(X)), breaks=m, labels=FALSE)
 
   n <- nrow(X)
   p <- ncol(X)
@@ -98,6 +98,8 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100 , lambda = NULL) {
     lambda = ridge_rat_vec * nridge
   }
 
+  # Define a progress bar
+  pb = txtProgressBar(min = 0, max = m, initial = 0)
 
   # Perform m-fold cross validation
   for(i in 1:m){
@@ -140,7 +142,12 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100 , lambda = NULL) {
       mean((pred - ytestData)^2)
     })
 
+    # Update progress bar
+    setTxtProgressBar(pb, i)
+
   }
+   # Close progress bar
+   close(pb)
 
    MSPE_cv = colMeans(mspe_matrix)
    min_lambda_index <- which.min(MSPE_cv)
