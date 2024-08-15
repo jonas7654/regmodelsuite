@@ -68,6 +68,7 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100 , lambda = NULL) {
 
   n <- nrow(X)
   p <- ncol(X)
+  stopifnot("n must be greater than m" = m < n)
 
   lambda_min <- rep(0,m)
 

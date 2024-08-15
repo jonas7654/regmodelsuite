@@ -37,11 +37,8 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   stopifnot(is.character(model) && model %in% valid_models)
 
   if (model %in% c("ridge", "lasso")) {
-    if (is.null(lambda)) {
+    if (!cv && is.null(lambda)) {
       stop("Please specify a lambda >= 0")
-    }
-    if (cv && length(lambda) <= 1) {
-      stop("For cross-validation, lambda must be a vector of length greater than 1")
     }
   }
 
@@ -108,21 +105,11 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     if (cv) {
       if (length(lambda > 1)) {
         cv_results <- lasso_cv(X, y, m = 10, lambda = lambda)
-        lambda <- cv_results$min_lambda
-        fit <- lasso(X, y, lambda)
-        names(fit$coefficients) <- var_names_x
-
-        cvLasso <- list(fit = fit, cv = cv_results)
-        results <- cvLasso
+        results <- cv_results
       }
       else {
         cv_results <- lasso_cv(X, y, m = 10, nridge = 100)
-        lambda <- cv_results$min_lambda
-        fit <- lasso(X, y, lambda)
-        names(fit$coefficients) <- var_names_x
-
-        cvLasso <- list(fit = fit, cv = cv_results)
-        results <- cvLasso
+        results <- cv_results
       }
     }
     else {
