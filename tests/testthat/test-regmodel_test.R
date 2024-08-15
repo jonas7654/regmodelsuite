@@ -99,3 +99,35 @@ test_that("missing data is handled", {
 
 
 
+
+test_that("multicollinearity is handled", {
+
+  n <- 100
+  p <- 5
+  X <- matrix(rnorm(n * p), nrow = n, ncol = p)
+  colnames(X) <- paste0("X", 1:p)
+  x1 <- X[ , 1]
+
+
+  y <- rnorm(n)
+  data <- data.frame(y, X1 = X[, 1], X2 = X[, 2], X3 = X[, 3], X4 = X[, 4], X5 = X[, 5])
+
+  formula <- y ~ X1 + X2 + X3 + X4 + X5
+  lambda <- 1
+
+  data_multicollinear <- data
+  data_multicollinear$X1_dup <- data_multicollinear$X1 * 1.01
+
+  formula_multicollinear <- as.formula(y ~ X1 + X1_dup + X2)
+
+  result <- regmodel(formula_multicollinear, data = data_multicollinear, model = "ridge", lambda = 0.5, cv = FALSE)
+
+  expect_no_error(result)
+  expect_true(!any(is.na(result$coefficients)))
+
+  result_lasso <- regmodel(formula_multicollinear, data = data_multicollinear, model = "lasso", lambda = 0.5, cv = FALSE)
+
+  expect_no_error(result)
+  expect_true(!any(is.na(result$coefficients)))
+})
+
