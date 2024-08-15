@@ -94,7 +94,7 @@ test_that("missing data is handled", {
   formula <- as.formula(y ~ x1 + x2 + as.factor(categorical))
 
   # Test for error due to missing values
-  expect_error(regmodel(formula, data = df_with_na_predictors, model = "lasso", lambda = 0.5, cv = FALSE))
+  expect_warning(regmodel(formula, data = df_with_na_predictors, model = "ridge", lambda = 0.5, cv = FALSE))
 
 })
 
