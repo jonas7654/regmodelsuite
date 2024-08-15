@@ -21,5 +21,14 @@ test_that("regmodel works with ridge regression", {
 
   # Test for ridge regression with a negative lambda
   expect_error(regmodel(formula = formula, data = data, model = "ridge", lambda = -1),
-               "Please specify a lambda >= 0")
+               "Lambda must be a positive number")
+  # Test for ridge regression with negative lambda grid
+  expect_error(regmodel(formula = formula, data = data, model = "ridge", lambda = c(-1,-2,-5,2)),
+               "Lambda must be a positive number")
+  # Test for ridge regression with a negative lambda
+  expect_error(regmodel(formula = formula, data = data, model = "lasso", lambda = -1),
+               "Lambda must be a positive number")
+  # Test for ridge regression with negative lambda grid
+  expect_error(regmodel(formula = formula, data = data, model = "lasso", lambda = c(-1,-2,-5,2)),
+               "Lambda must be a positive number")
 })
