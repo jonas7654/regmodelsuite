@@ -83,7 +83,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   # Init
   results <- list()
-  call <- getc
+  call <- match.call()
 
   # extract column names
   var_names_x <- dimnames(X)[[2]]
@@ -125,7 +125,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   }
 
-
-
+  # Add function call to results
+  results$call <- call
   return(results)
 }
