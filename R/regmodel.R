@@ -93,12 +93,6 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
                        data = data, na.action = "na.pass") # removed intercept
   y <- model.response(mf)
 
-  # Edge case if X contains only one variable
-  if (is.null(dim(X))) {
-    X <- as.matrix(X)
-    dim(X) <- c(length(X), 1)
-  }
-
 
   ### Handle missing values ###
 
@@ -112,6 +106,14 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   }
   X <- X[complete_rows , ]
   y <- y[complete_rows]
+
+
+  # Edge case if X contains only one variable
+  if (is.null(dim(X))) {
+    X <- as.matrix(X)
+    dim(X) <- c(length(X), 1)
+  }
+
 
 
   # Init
