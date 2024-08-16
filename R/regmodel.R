@@ -14,12 +14,10 @@
 #' @export
 
 # TODO
-# Add option to remove or include intercept ?
 # Identical return lists for each function
 # Add X and y variable to return list in order to call predict efficiently
 # Plots
 # Better output on return object. Maybe implement summary?
-# Compute standardized X and y in regmodel or in estimation functions?
 # names(fit$coefficients) <- var_names_x at the end of the function? Requires identical output between functions
 # include r-squared into output via calculate_R2...
 # explain lambda grid
@@ -85,23 +83,12 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   }
 
 
-  ### Handle missing values ###
-
-  # Find complete rows and drop NA rows
-  complete_rows <- complete.cases(data)
-  if (sum(complete_rows) == 0) {
-    stop("The dataframe has  only missing values")
-  }
-  if (sum(!complete_rows) > 0) {
-    warning(paste(sum(!complete_rows), "rows with missing values"))
-  }
-  data <- data[complete_rows , ]
-
-
 
   # Create model frame
-  mf <- model.frame(formula, data = data)
-  X <- model.matrix(formula, data = data)[ , -1] # removed intercept
+    # keep NA's in order to generate a warning before removing them
+  mf <- model.frame(formula, data = data, na.action = "na.pass")
+  X <- model.matrix.lm(update(formula, ~ . + 0),
+                       data = data, na.action = "na.pass") # removed intercept
   y <- model.response(mf)
 
   # Edge case if X contains only one variable
@@ -110,6 +97,19 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     dim(X) <- c(length(X), 1)
   }
 
+
+  ### Handle missing values ###
+
+  # Find complete rows and drop NA rows
+  complete_rows <- complete.cases(X)
+  if (sum(complete_rows) == 0) {
+    stop("The dataframe has only missing values")
+  }
+  if (sum(!complete_rows) > 0) {
+    warning(paste(sum(!complete_rows), "rows with missing values"))
+  }
+  X <- X[complete_rows , ]
+  y <- y[complete_rows]
 
 
   # Init

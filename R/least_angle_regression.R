@@ -95,6 +95,7 @@ least_angle_regression <- function(X, y, verbose = F) {
   # Calculate R-Squared for each model
   r2 <- apply(coefficient_matrix, 1, function(beta) {calculate_R2(y, X %*% beta)}
              )
+  dim(r2) <- c(length(r2), 1)
 
   output_list <- list(coefficients = coefficient_matrix,
                       l1_arc_length = arg_length,

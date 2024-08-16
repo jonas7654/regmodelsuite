@@ -159,5 +159,9 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100 , lambda = NULL) {
                       min_lambda = min_lambda,
                       m_folds = m,
                       MSPE = MSPE_cv)
+
+   class(returnList) <- "lasso_cv"
+
+
    return(returnList)
 }
