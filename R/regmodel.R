@@ -134,7 +134,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   # Least angle regression call
   if (model == "LAR") {
     fit <- least_angle_regression(X, y)
-    names(fit$coefficients) <- var_names_x
+    colnames(fit$coefficients) <- var_names_x
     results <- fit
   }
 
