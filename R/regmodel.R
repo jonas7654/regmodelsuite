@@ -88,7 +88,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   formula_without_intercept <- as.formula(paste(deparse(formula) , "+ 0"))
 
   # keep NA's in order to generate a warning before removing them
-  mf <- model.frame(formula, data = data, na.action = "na.pass")
+  mf <- model.frame(formula_without_intercept, data = data, na.action = "na.pass")
   X <- model.matrix.lm(formula_without_intercept,
                        data = data, na.action = "na.pass") # removed intercept
   y <- model.response(mf)
@@ -104,10 +104,12 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   if (sum(!complete_rows) > 0) {
     warning(paste(sum(!complete_rows), "rows with missing values"))
   }
-  X <- X[complete_rows , ]
+  X <- X[complete_rows , , drop = FALSE]
   y <- y[complete_rows]
 
 
+
+  # This is probably not needed anymore since X[, , drop = FALSE] is set
   # Edge case if X contains only one variable
   if (is.null(dim(X))) {
     X <- as.matrix(X)
