@@ -58,7 +58,6 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
       # 2
       beta_j_tilde <- mean(X_scaled[ , j] * r)
-      print(beta_j_tilde)
 
       # 3
       beta_j_next <- ifelse(j == 1, beta_j_tilde,
