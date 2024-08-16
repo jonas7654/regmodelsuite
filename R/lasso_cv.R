@@ -99,7 +99,7 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100 , lambda = NULL) {
   }
 
   # Define a progress bar
-  pb = txtProgressBar(min = 0, max = m, initial = 0)
+  pb = txtProgressBar(min = 0, max = m, initial = 0, , style = 3)
 
   # Perform m-fold cross validation
   for(i in 1:m){

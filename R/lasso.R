@@ -35,13 +35,12 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
   max_iterations <- 1000
 
-  # Define a progress bar
-  pb = txtProgressBar(min = 0, max = max_iterations, initial = 0)
 
   while((max_abs_beta_diff > tol) && (m <= max_iterations)) {
 
-    # Update progress bar
-    setTxtProgressBar(pb, m)
+    # Define a progress bar
+    pb = txtProgressBar(min = 0, max = p, initial = 0, style = 3)
+
 
     # Only for debugging
     if(verbose) {
@@ -53,6 +52,9 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
     beta_old <- beta
 
     for (j in 1:p) {
+      # Update progress bar
+      setTxtProgressBar(pb, p)
+
       # 1
       r <- y_demeaned - X_scaled[ , -j] %*% beta[-j]
 
@@ -72,10 +74,10 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
     max_abs_beta_diff <- max(abs(beta - beta_old))
     m <- m + 1
 
+    # Close progress bar
+    close(pb)
   }
 
-  # Close progress bar
-  close(pb)
 
   # Output section
 
