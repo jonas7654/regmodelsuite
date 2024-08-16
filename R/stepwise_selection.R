@@ -1,7 +1,7 @@
 #' Finds a subset of predictors using forward or backward selection
 #'
 #' @param X Dataset X
-#' @param Y Dataset y
+#' @param y Dataset y
 #' @param n_predicors Amount of predictors to select
 #' @param model Modeling function
 #' @param direction Selection direction, either "forward" or "backward"
@@ -10,7 +10,8 @@
 #' @return A fitted model using the selected predictors.
 #'
 #' @return A double value
-select <- function(X, y, n_predictors, model = lm, direction = "forward", verbose = TRUE) {
+stepwise_selection <- function(X, y, n_predictors, model = lm,
+                               direction = "forward", verbose = TRUE) {
 
   forward <- FALSE
 
@@ -29,8 +30,8 @@ select <- function(X, y, n_predictors, model = lm, direction = "forward", verbos
   else
     stop("direction has to be \"forward\" or \"backward\".")
 
-  # Combining X and y for testing with lm (Remove later)
-  X["y"] <- data.frame(y)
+  # Combining X and y and converting to data frame
+  X <- data.frame(cbind(X, y))
 
   for(i in 1:iterations) {
 
@@ -94,5 +95,12 @@ select <- function(X, y, n_predictors, model = lm, direction = "forward", verbos
     }
   }
 
-  best_fit
+  results <- list(model = best_fit,
+                  predictors = used_predictors,
+                  loss = best_loss,
+                  direction = direction)
+
+  class(results) <- "stepwise_selection"
+
+  results
 }
