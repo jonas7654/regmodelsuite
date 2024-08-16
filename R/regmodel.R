@@ -147,6 +147,10 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
         cv_results <- lasso_cv(X, y, m = 10, nridge = length(lambda), lambda = lambda)
         results <- cv_results
       }
+      else if (is.null(lambda)) {
+        cv_results <- lasso_cv(X, y, m = 10)
+        results <- cv_results
+      }
       else {
         cv_results <- lasso(X, y, lambda)
         warning("no cross validation was performed")
