@@ -3,8 +3,6 @@ plot.ridge <- function(ridgeobj) {
     stop("The provided object is not of class 'ridge'")
   }
 
-  library(ggplot2)
-
   plot_values <- data.frame(x1 = sort(ridgeobj$model[,1]), y = ridgeobj$y, fitted = ridgeobj$coefficients)
 
   ggplot(plot_values, aes(x = x1, y = y)) +
