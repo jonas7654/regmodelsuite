@@ -85,9 +85,11 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
 
   # Create model frame
-    # keep NA's in order to generate a warning before removing them
+  formula_without_intercept <- as.formula(paste(deparse(formula) , "+ 0"))
+
+  # keep NA's in order to generate a warning before removing them
   mf <- model.frame(formula, data = data, na.action = "na.pass")
-  X <- model.matrix.lm(update(formula, ~ . + 0),
+  X <- model.matrix.lm(formula_without_intercept,
                        data = data, na.action = "na.pass") # removed intercept
   y <- model.response(mf)
 
