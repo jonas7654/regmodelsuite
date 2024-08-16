@@ -54,7 +54,7 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
     for (j in 1:p) {
       # 1
-      r <- y - X_scaled[ , -j] %*% beta[-j]
+      r <- y_demeaned - X_scaled[ , -j] %*% beta[-j]
 
       # 2
       beta_j_tilde <- mean(X_scaled[ , j] * r)
@@ -88,7 +88,10 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
                     active_variables = coef_active,
                     inactive_variables = coef_inactive,
                     iterations = m,
-                    lambda = lambda)
+                    lambda = lambda,
+                    y_mean = attr(y_demeaned, "scaled::center"),
+                    x_mean = attr(X_scaled, "scaled::center"),
+                    x_sd = attr(X_scaled, "scaled::scale"))
 
   class(lasso_obj) <- "lasso"
 
