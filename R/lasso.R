@@ -24,16 +24,24 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
 
   # Init
-  X_scaled <- scale(X, scale = F)
+  X_scaled <- scale(X, scale = T)
+  y_demeaned <- scale(y , scale = F)
   beta <- double(p)
   max_abs_beta_diff <- Inf
 
   mean_X_scaled_squared <- colMeans(X_scaled^2)
 
-  m <- 0L
+  m <- 1L
 
+  max_iterations <- 1000
 
-  while(max_abs_beta_diff > tol) {
+  # Define a progress bar
+  pb = txtProgressBar(min = 0, max = max_iterations, initial = 0)
+
+  while((max_abs_beta_diff > tol) && (m <= max_iterations)) {
+
+    # Update progress bar
+    setTxtProgressBar(pb, m)
 
     # Only for debugging
     if(verbose) {
@@ -50,6 +58,7 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
       # 2
       beta_j_tilde <- mean(X_scaled[ , j] * r)
+      print(beta_j_tilde)
 
       # 3
       beta_j_next <- ifelse(j == 1, beta_j_tilde,
@@ -65,6 +74,9 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
     m <- m + 1
 
   }
+
+  # Close progress bar
+  close(pb)
 
   # Output section
 
