@@ -117,11 +117,6 @@ cross_validation <- function(X, y, m = 10, lambda) {
 
     traindata_scaled <- (testData - x_mean) / x_sd
 
-    y_predicted <- as.matrix(apply(beta,
-                                   2 ,
-                                   function(x) {traindata_scaled %*% x},
-                                   simplify = TRUE))
-
     # Rescale predicated values
     # This is a n x length(lambda) matrix
     out_of_sample_predicted_y <- as.matrix(apply(beta, 2, function(beta) {
