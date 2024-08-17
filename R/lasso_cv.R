@@ -68,8 +68,29 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
 
 
-lasso_cv <- function(X, y, m = 10, lambda, iter = 1e-07) {
+lasso_cv <- function(X, y, m = 10, lambda = NULL, iter = 1e-07) {
+  # --- Errors and Warnings --- #
 
+  m <- as.integer(m)
+  stopifnot("m has to be 2 or larger" = m > 1)
+  stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))
+
+  if (nrow(X) %% m != 0) {
+    warning("nrow(X) is not divisible by m. Will divide X into m nearly equally sized folds.")
+  }
+
+  if (!is.null(lambda)) {
+    stopifnot("lambda values must be numeric" = is.numeric(lambda))
+    stopifnot("lambda must be a vector" = is.vector(lambda))
+    stopifnot("lambda must not contain negative values" = all(lambda >= 0))
+
+
+    if (any(lambda == 0)) {
+      warning("lambda contains 0. Ridge regression with lambda = 0 is equivalent to Least Squares Regression.")
+    }
+  }
+
+  stopifnot("X and y must have the same amount of rows" = nrow(X) == nrow(y))
 
   # Randomize order of data
   random_order <- sample(1:nrow(X))
@@ -84,7 +105,7 @@ lasso_cv <- function(X, y, m = 10, lambda, iter = 1e-07) {
 
   lambda_min <- rep(0,m)
 
-  if(missing(lambda)) {
+  if(is.null(lambda)) {
     # specify a lambda grid. log transformation to favor smaller values
     ridge_rat_max = 50
     ridge_rat_min = 0.002

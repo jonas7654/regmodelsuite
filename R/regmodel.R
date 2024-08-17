@@ -26,40 +26,43 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
                      cv = FALSE, ...) {
 
   # Input checks
-  stopifnot("please provide a valid formula object" =
+  stopifnot("Please provide a valid formula object" =
               !is.null(formula) && inherits(formula, "formula")
            )
-  stopifnot("cv must be length 1 logical value " = (is.logical(cv)) && (length(cv) == 1)
-           )
+  stopifnot("cv must be either TRUE or FALSE" = is.logical(cv))
 
-  valid_models <- c("ridge", "lasso", "forward", "backward", "LAR")
-  stopifnot("Please select a valid model" =
-              is.character(model) && model %in% valid_models)
+  stopifnot("cv must be a single logical value" = length(cv) == 1)
 
-  if (model %in% c("ridge", "lasso")) {
-    if (!cv) {
-      if (is.null(lambda)) {
-        stop("Please specify a lambda >= 0")
-      }
-      if (!is.numeric(lambda)  || lambda < 0 || length(lambda) != 1) {
-        stop("Lambda must be a positive number")
-      }
+  if (cv) {
+    valid_models <- c("ridge", "lasso")
+    stopifnot("Please select a valid model for cross validation. See ?regmodel" =
+                is.character(model) && model %in% valid_models)
+
+    # Otherwise, ridge_cv will generate default lambda
+    if (!missing(lambda)) {
+      stopifnot("lambda values must be numeric" = is.numeric(lambda))
+      stopifnot("lambda values must be a vector" = is.vector(lambda))
+      stopifnot("lambda values may not be negative" = all(lambda >= 0))
+      stopifnot("Provide either a vector with length >= 2 or no lambda for cross validation.
+    See ?ridge_cv or ?lasso_cv for details" =
+                  length(lambda) != 1)
     }
-    # If cv is TRUE
-    else {
-      if(!is.null(lambda)) {
-        stopifnot("lambda values must be positive" = all(lambda > 0))
-      }
+  }
+  else {
+    valid_models <- c("ridge", "lasso", "forward", "backward", "LAR")
+    stopifnot("Please select a valid model. See ?regmodel" =
+                is.character(model) && model %in% valid_models)
+
+    stopifnot("Please specify a lambda" = !is.null(lambda))
+
+    stopifnot("lambda must be numeric" = is.numeric(lambda))
+    stopifnot("lambda must be a single number" = length(lambda) == 1)
+    stopifnot("lambda may not be negative" = lambda >= 0)
     }
-}
 
   if (!is.null(data)) {
     stopifnot("data must be of type data.frame" = is.data.frame(data))
   }
-
-
-
-
 
 
   ########################################################################
@@ -116,8 +119,6 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     dim(X) <- c(length(X), 1)
   }
 
-
-
   # Init
   results <- list()
   call <- match.call()
@@ -128,46 +129,45 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   # Ridge call
   if (model == "ridge") {
-    fit <- ridge(X, y, lambda)
-    # Add corresponding variable names to output
-    names(fit$coefficients) <- var_names_x
+    if (cv) {
+      if (!exists("m")) {
+        warning("No m was explicitly provided for cross validation. Proceeding with m = 10")
+      }
+      # ... for optional m input
+      cv_results <- ridge_cv(X, y, lambda = lambda, ...)
+      results <- cv_results
+    }
+    else {
+      fit <- ridge(X, y, lambda)
+      # Add corresponding variable names to output
+      names(fit$coefficients) <- var_names_x
 
-    results <- fit
+      results <- fit
+    }
   }
-
   # Least angle regression call
-  if (model == "LAR") {
+  else if (model == "LAR") {
     fit <- least_angle_regression(X, y)
     colnames(fit$coefficients) <- var_names_x
     results <- fit
   }
-
   # Lasso regression call
-  if (model == "lasso") {
+  else if (model == "lasso") {
     if (cv) {
-      if (length(lambda) > 1 ) {
-        cv_results <- lasso_cv(X, y, m = 10, nridge = length(lambda), lambda = lambda)
-        results <- cv_results
+      if (!exists("m")) {
+        warning("No m was explicitly provided for cross validation. Proceeding with m = 10")
       }
-      else if (is.null(lambda)) {
-        cv_results <- lasso_cv(X, y, m = 10)
-        results <- cv_results
-      }
-      else {
-        cv_results <- lasso(X, y, lambda)
-        warning("no cross validation was performed")
-        results <- cv_results
-      }
+      # ... for optional m input
+      cv_results <- lasso_cv(X, y, lambda = lambda, ...)
+      results <- cv_results
     }
     else {
       fit <- lasso(X, y, lambda)
       names(fit$coefficients) <- var_names_x
       results <- fit
     }
-
   }
-
-  if(model == "forward") {
+  else if(model == "forward") {
     results <- forward_selection(X, y, ...)
   }
   else if(model == "backward") {

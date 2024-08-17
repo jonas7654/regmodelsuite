@@ -2,4 +2,6 @@
 
 S3method(coef,lasso)
 S3method(plot,LAR)
+S3method(predict,ridge)
+S3method(print,LAR)
 export(regmodel)

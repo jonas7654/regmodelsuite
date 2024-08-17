@@ -8,9 +8,8 @@ regmodel(
   formula = NULL,
   data = NULL,
   model = NULL,
-  lambda = 0,
+  lambda = NULL,
   cv = FALSE,
-  intercept = FALSE,
   ...
 )
 }
@@ -20,9 +19,7 @@ regmodel(
 \item{data}{A data frame which contains the corresponding variables}
 
 \item{model}{Logical value which specifies if cross validation for lambda
-should be used
-@param ... Additional parameter for the model. Further information see:
-\link[regmodelsuite]{lasso}}
+should be used}
 
 \item{lambda}{penalty parameter for ridge and lasso estimation. If cv = TRUE
 lambda will be ignored all of them are tested to find the optimal lambda

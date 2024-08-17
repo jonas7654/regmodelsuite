@@ -9,7 +9,7 @@ recursive_data_search(data, env)
 \arguments{
 \item{data}{Name of data object}
 
-\item{env}{current environment for recrusive search}
+\item{env}{current environment for recursive search}
 }
 \description{
 Recursively search parent environments for data

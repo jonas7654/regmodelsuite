@@ -16,7 +16,7 @@
 # Version 3
 
 
-cross_validation <- function(X, y, m = 10, lambda) {
+ridge_cv <- function(X, y, m = 10, lambda = NULL) {
   # --- Errors and Warnings --- #
 
   m <- as.integer(m)
@@ -27,18 +27,14 @@ cross_validation <- function(X, y, m = 10, lambda) {
     warning("nrow(X) is not divisible by m. Will divide X into m nearly equally sized folds.")
   }
 
-  if (!missing(lambda)) {
-    stopifnot("lambda must be numeric" = is.numeric(lambda))
+  if (!is.null(lambda)) {
+    stopifnot("lambda values must be numeric" = is.numeric(lambda))
     stopifnot("lambda must be a vector" = is.vector(lambda))
     stopifnot("lambda must not contain negative values" = all(lambda >= 0))
 
+
     if (any(lambda == 0)) {
       warning("lambda contains 0. Ridge regression with lambda = 0 is equivalent to Least Squares Regression.")
-      OLS <- lm.fit(X, y)$coefficients
-      if (ncol(X) >= nrow(X)) {
-        warning("The matrix X suffers from multicollinearity")
-      }
-      return(as.vector(OLS))
     }
   }
 
@@ -57,7 +53,7 @@ cross_validation <- function(X, y, m = 10, lambda) {
   # --- Default Lambda --- #
   # If no lambda is provided, specify a lambda grid.
   # log transformation to favor smaller values
-  if (missing(lambda)) {
+  if (is.null(lambda)) {
     ridge_rat_max = 50
     ridge_rat_min = 0.002
 
