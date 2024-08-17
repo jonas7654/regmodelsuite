@@ -167,8 +167,11 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   }
 
-  if (model %in% c("forward", "backward")) {
-    results <- stepwise_selection(X, y, direction = model, ...)
+  if(model == "forward") {
+    results <- forward_selection(X, y, ...)
+  }
+  else if(model == "backward") {
+    results <- backward_selection(X, y, ...)
   }
 
   # Add function call to results

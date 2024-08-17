@@ -1,56 +1,41 @@
-#' Finds a subset of predictors using forward or backward selection
+#' Finds a subset of predictors using forward selection
 #'
 #' @param X Dataset X
 #' @param y Dataset y
 #' @param n_predicors Amount of predictors to select
 #' @param model Modeling function
-#' @param direction Selection direction, either "forward" or "backward"
 #' @param verbose Whether to print information of the selection process
 #'
-#' @return A fitted model using the selected predictors.
-#'
-#' @return A double value
-stepwise_selection <- function(X, y, n_predictors, model = lm,
-                               direction = "forward", verbose = TRUE) {
+#' @return A stepwise_selection object
+forward_selection <- function(X, y, n_predictors, model = lm,
+                               verbose = TRUE) {
 
-  forward <- FALSE
+  stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
 
-  # Initializing the variables for the selected direction
-  if(direction == "forward") {
-    unused_predictors <- colnames(X)
-    used_predictors <- c()
-    iterations <- n_predictors
-    forward <- TRUE
-  }
-  else if(direction == "backward") {
-    unused_predictors <- c()
-    used_predictors <- colnames(X)
-    iterations <- length(used_predictors) - n_predictors
-  }
-  else
-    stop("direction has to be \"forward\" or \"backward\".")
+  unused_predictors <- colnames(X)
+  used_predictors <- c()
+  iterations <- min(n_predictors, ncol(X))
 
   # Combining X and y and converting to data frame
   X <- data.frame(cbind(X, y))
 
+  formula_start <- paste(colnames(X)[ncol(X)], "~")
+
   for(i in 1:iterations) {
 
     if(verbose)
-      cat(sprintf("%dth predictor:\n", i))
+      cat(sprintf("%dth iteration:\n", i))
 
     best_loss <- NULL
 
-    # Iterating through the predictors not added or removed
-    for(p in seq_along(if(forward) unused_predictors else used_predictors)) {
+    for(p in seq_along(unused_predictors)) {
 
       # Creating new combination of predictors to test
-      if(forward)
-        cur_predictors <- c(used_predictors, unused_predictors[p])
-      else
-        cur_predictors <- used_predictors[-p]
+      cur_predictors <- c(used_predictors, unused_predictors[p])
 
       # Creating formula object with the new combination
-      formula <- as.formula(paste("y ~", paste(cur_predictors, collapse="+")))
+      formula <- as.formula(paste(formula_start,
+                                  paste(cur_predictors, collapse="+")))
 
       fit <- model(formula, X)
 
@@ -61,10 +46,7 @@ stepwise_selection <- function(X, y, n_predictors, model = lm,
       loss <- sum((y - prediction) ^ 2) / length(prediction)
 
       if(verbose) {
-        if(forward)
-          cat(sprintf("  + %s: %f\n", unused_predictors[p], loss))
-        else
-          cat(sprintf("  - %s: %f\n", used_predictors[p], loss))
+        cat(sprintf("  + %s: %f\n", unused_predictors[p], loss))
       }
 
       # Checking if the loss is currently the best
@@ -76,29 +58,101 @@ stepwise_selection <- function(X, y, n_predictors, model = lm,
     }
 
     if(verbose) {
-      if(forward)
-        cat(sprintf("Added predicor '%s', Loss: %f\n\n",
+      cat(sprintf("Added predicor '%s', Loss: %f\n\n",
                     unused_predictors[best_predictor], best_loss))
-      else
-        cat(sprintf("Removed predicor '%s', Loss: %f\n\n",
-                    used_predictors[best_predictor], best_loss))
     }
 
     # Removing and adding the selected predictor from the lists
-    if(forward) {
-      used_predictors <- c(used_predictors, unused_predictors[best_predictor])
-      unused_predictors <- unused_predictors[-best_predictor]
-    }
-    else {
-      unused_predictors <- c(unused_predictors, used_predictors[best_predictor])
-      used_predictors <- used_predictors[-best_predictor]
-    }
+    used_predictors <- c(used_predictors, unused_predictors[best_predictor])
+    unused_predictors <- unused_predictors[-best_predictor]
   }
 
   results <- list(model = best_fit,
                   predictors = used_predictors,
                   loss = best_loss,
-                  direction = direction)
+                  direction = "forward")
+
+  class(results) <- "stepwise_selection"
+
+  results
+}
+
+#' Finds a subset of predictors using backward selection
+#'
+#' @param X Dataset X
+#' @param y Dataset y
+#' @param n_predicors Amount of predictors to select
+#' @param model Modeling function
+#' @param verbose Whether to print information of the selection process
+#'
+#' @return A stepwise_selection object
+backward_selection <- function(X, y, n_predictors, model = lm, verbose = TRUE) {
+
+  stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
+
+  stopifnot("More data points than predictors required."
+            = nrow(X) > ncol(X))
+
+  used_predictors <- colnames(X)
+  iterations <- length(used_predictors) - n_predictors + 1
+
+  # Combining X and y and converting to data frame
+  X <- data.frame(cbind(X, y))
+
+  formula_start <- paste(colnames(X)[ncol(X)], "~")
+
+  for(i in 1:iterations) {
+
+    best_loss <- NULL
+
+    # Creating formula object with the new combination
+    formula <- as.formula(paste(formula_start,
+                                  paste(used_predictors, collapse="+")))
+
+    fit <- model(formula, X)
+
+    # Predicting the data with the fitted model
+    prediction <- predict(fit, X)
+
+    # Calculating squared loss
+    loss <- sum((y - prediction) ^ 2) / length(prediction)
+
+    if(verbose)
+      cat(sprintf("%f\n\n", loss))
+
+    # The last iteration is just for fitting the model and calculating the loss
+    if(i == iterations)
+      break
+
+    if(verbose)
+      cat(sprintf("%dth iteration:\n", i))
+
+    # Calculating the Z-scores of the coefficients
+    coef <- coef(summary(fit))
+    scores <- coef[, "Estimate"][-1] / coef[, "Std. Error"][-1]
+
+    if(verbose) {
+      for(s in names(scores))
+        cat(sprintf("  - %s Z-score: %f\n", s, scores[s]))
+    }
+
+    # Getting predictor with the lowest Z-score
+    lowest_which <- which.min(abs(scores))
+    lowest_name <- names(scores)[lowest_which]
+    lowest_score <- scores[lowest_which]
+
+    if(verbose)
+      cat(sprintf("Removed predictor '%s' with Z-score: %f. Loss: ",
+                  lowest_name, lowest_score))
+
+    # Removing the predictor with the lowest Z-score from the used predictors
+    used_predictors <- used_predictors[-lowest_which]
+  }
+
+  results <- list(model = fit,
+                  predictors = used_predictors,
+                  loss = loss,
+                  direction = "backward")
 
   class(results) <- "stepwise_selection"
 
