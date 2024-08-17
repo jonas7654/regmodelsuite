@@ -73,6 +73,9 @@ cross_validation <- function(X, y, m = 10, lambda) {
     lambda = ridge_rat_vec * 100
   }
 
+  # Define a progress bar
+  pb = txtProgressBar(min = 0, max = m, initial = 0, , style = 3)
+
   beta <- matrix(nrow = ncol(X), ncol = length(lambda))
 
   # Mean square prediction error of each validation
@@ -129,20 +132,26 @@ cross_validation <- function(X, y, m = 10, lambda) {
     mspe_temp[i , ] <- apply(out_of_sample_predicted_y, 2, function(pred) {
       mean((pred - ytestData)^2)},
       simplify = TRUE)
-  }
 
-  MSPE_cv= colMeans(mspe_temp)
+    # Update progress bar
+    setTxtProgressBar(pb, i)
+
+  }
+  # Close progress bar
+  close(pb)
+
+  MSPE_cv = colMeans(mspe_temp)
   min_lambda_index <- which.min(MSPE_cv)
 
   min_lambda = lambda[min_lambda_index]
 
-  # Estimate the model once again with the optimal lambda
-  beta_final <- ridge(X, y, lambda[min_lambda_index])
-
-  returnList <- list(lambda_grid= lambda,
-                     cv_lambda = min_lambda,
+  returnList <- list(nridge = length(lambda),
+                     lambda_grid = lambda,
+                     min_lambda = min_lambda,
                      m_folds = m,
-                     MSPE = mspe_temp[min_lambda_index],
-                     final_model_coef = beta_final)
+                     MSPE = MSPE_cv)
+
+  class(returnList) <- "ridge_cv"
+
   return(returnList)
 }

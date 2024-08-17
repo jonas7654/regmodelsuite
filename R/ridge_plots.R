@@ -4,9 +4,9 @@ ridge_plots <- function(X,y,m){
 }
 
 ridge_plot <- function(X,y,m){
-  cv_line <- X %*% ridge(X,y,cross_validation(X,y,m)$cv.lambda)
+  cv_line <- X %*% ridge(X,y,ridge_cv(X,y,m)$cv.lambda)
   plot(X[,1], y, main="Ridge-Schätzer", xlab="x1", ylab="y", pch=19, col="blue")
-  lines(X[order(X[,1])], cv_line[order(X[,1])], col="red", lwd=2)
+  lines(sort(X[,1]), cv_line, col="red", lwd=2)
 }
 
 ridge_plot_profile_lines <- function(X,y,m){

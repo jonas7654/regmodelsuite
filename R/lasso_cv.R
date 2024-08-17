@@ -101,6 +101,9 @@ lasso_cv <- function(X, y, m = 10, lambda, iter = 1e-07) {
     lambda = ridge_rat_vec * 100
   }
 
+  # Define a progress bar
+  pb = txtProgressBar(min = 0, max = m, initial = 0, , style = 3)
+
   beta <- matrix(nrow = p, ncol = length(lambda))
 
   # Mean square prediction error of each validation
@@ -153,20 +156,25 @@ lasso_cv <- function(X, y, m = 10, lambda, iter = 1e-07) {
       mean((pred - ytestData)^2)
     })
 
+    # Update progress bar
+    setTxtProgressBar(pb, i)
+
   }
+  # Close progress bar
+  close(pb)
 
-   MSPE_cv= colMeans(mspe_matrix)
-   min_lambda_index <- which.min(MSPE_cv)
+  MSPE_cv = colMeans(mspe_matrix)
+  min_lambda_index <- which.min(MSPE_cv)
 
-   min_lambda = lambda[min_lambda_index]
+  min_lambda = lambda[min_lambda_index]
 
-   # Estimate the model once again with the optimal lambda
-   beta_final <- lasso_estimator(lambda[min_lambda_index])
+  returnList <- list(nridge = length(lambda),
+                     lambda_grid = lambda,
+                     min_lambda = min_lambda,
+                     m_folds = m,
+                     MSPE = MSPE_cv)
 
-   returnList <- list(lambda_grid= lambda,
-                      cv_lambda = min_lambda,
-                      m_folds = m,
-                      MSPE = MSPE_cv[min_lambda_index],
-                      final_model_coef = beta_final)
-   return(returnList)
+  class(returnList) <- "lasso_cv"
+
+  return(returnList)
 }

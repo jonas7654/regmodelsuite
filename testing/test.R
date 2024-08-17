@@ -6,6 +6,7 @@ library(tidyverse)
 library(glmnet)
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
+
 school_data <- read_dta("ca_school_testscore.dta") %>%
   dplyr::select('math_score',
                 'str_s' ,
@@ -81,40 +82,9 @@ train_data = school_data[train_rows,]
 test_data = school_data[-train_rows,]
 
 # Large model with all variables, squared variables and cubic variables as well as all interactions
-reg_equation <- formula(math_score ~ .)
+reg_equation <- formula(math_score ~ .*.)
 dim(model.matrix(reg_equation, train_data))
 
 
-##########################################################################
-if(!requireNamespace("tm", quietly = TRUE)) {
-  install.packages("tm")
-}
-library(tm)
-
-# Example text corpus (small for demonstration)
-texts <- c("Text mining is fun", "R is great for text analysis", "High-dimensional data can be challenging")
-corpus <- Corpus(VectorSource(texts))
-# Convert to lowercase
-corpus <- tm_map(corpus, content_transformer(tolower))
-
-# Remove punctuation
-corpus <- tm_map(corpus, removePunctuation)
-
-# Remove stopwords (like 'the', 'and', etc.)
-corpus <- tm_map(corpus, removeWords, stopwords("english"))
-
-# Convert to Document-Term Matrix (DTM)
-dtm <- DocumentTermMatrix(corpus, control = list(weighting = weightTfIdf))
-
-# Convert to matrix
-X <- as.matrix(dtm)
-
-# Simulate a response variable
-y <- rnorm(nrow(X))
-
-# Convert to data frame
-dataframe <- as.data.frame(cbind(y, X))
-
-# Create a formula for the model
-model_formula <- formula(paste("y ~", paste(colnames(X), collapse = " + ")))
-
+fit <-regmodel(reg_equation, data = train_data, model = "lasso", lambda = c(1,2,3,4,5), cv = T)
+print.ridge(fit)

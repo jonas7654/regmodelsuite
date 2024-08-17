@@ -61,7 +61,7 @@ least_angle_regression <- function(X, y, verbose = F) {
     else {
       alpha_neg <- (C_max - C_j[!active_variables]) / ((1 / sqrt_w) - B[!active_variables, ])
       alpha_pos <- (C_max + C_j[!active_variables]) / ((1 / sqrt_w) + B[!active_variables, ])
-      alpha <- min(c(alpha_neg[alpha_neg > 0], alpha_pos[alpha_pos > 0]), na.rm = TRUE)
+      alpha <- min(c(alpha_neg, alpha_pos), na.rm = TRUE)
     }
 
 
@@ -75,7 +75,7 @@ least_angle_regression <- function(X, y, verbose = F) {
 
     ############################################################################
 
-    # Verbose option
+    # Verbose option only for debugging
     if (verbose) {
       cat("Iteration:", i, "\n")
       cat("Active Variables:", which(active_variables), "\n")
@@ -90,19 +90,29 @@ least_angle_regression <- function(X, y, verbose = F) {
   }
 
   # Calculate arc length
-  arg_length <- apply(coefficient_matrix, 1, function(x) {sum(abs(x))})
+  l1_arc_length <- rowSums(abs(coefficient_matrix))
 
   # Calculate R-Squared for each model
   r2 <- apply(coefficient_matrix, 1, function(beta) {calculate_R2(y, X %*% beta)}
              )
+  dim(r2) <- c(length(r2), 1)
 
   output_list <- list(coefficients = coefficient_matrix,
-                      l1_arc_length = arg_length,
-                      R2 = r2)
+                      l1_arc_length = l1_arc_length,
+                      R2 = r2,
+                      y = y,
+                      mean_y = attr(y_demeaned, "scaled:center"),
+                      mean_x = attr(X_scaled, "scaled:center"),
+                      sd_x = attr(X_scaled, "scaled:scale"),
+                      model = X,
+                      n = n,
+                      p = p)
 
   # Modify S3 class
   class(output_list) <- "LAR"
 
   return (output_list)
+
+
 
 }

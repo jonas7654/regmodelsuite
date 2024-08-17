@@ -2,3 +2,4 @@
 
 S3method(coef,lasso)
 S3method(plot,LAR)
+export(regmodel)

@@ -24,16 +24,21 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
 
   # Init
-  X_scaled <- scale(X, scale = F)
+  X_scaled <- scale(X, scale = T)
+  y_demeaned <- scale(y , scale = F)
   beta <- double(p)
   max_abs_beta_diff <- Inf
 
   mean_X_scaled_squared <- colMeans(X_scaled^2)
 
-  m <- 0L
+  m <- 1L
+
+  max_iterations <- 1000
 
 
-  while(max_abs_beta_diff > tol) {
+  while((max_abs_beta_diff > tol) && (m <= max_iterations)) {
+
+
 
     # Only for debugging
     if(verbose) {
@@ -45,8 +50,9 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
     beta_old <- beta
 
     for (j in 1:p) {
+
       # 1
-      r <- y - X_scaled[ , -j] %*% beta[-j]
+      r <- y_demeaned - X_scaled[ , -j, drop = FALSE] %*% beta[-j]
 
       # 2
       beta_j_tilde <- mean(X_scaled[ , j] * r)
@@ -66,12 +72,22 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
   }
 
+
   # Output section
 
+  beta <- round(beta, 6)
+  coef_active <- names(beta[beta > 0])
+  coef_inactive <- names(beta[beta == 0])
 
-  lasso_obj <- list(coefficients = round(beta, 6),
+  lasso_obj <- list(coefficients = beta,
+                    active_variables = coef_active,
+                    inactive_variables = coef_inactive,
                     iterations = m,
-                    lambda = lambda)
+                    lambda = lambda,
+                    y_mean = attr(y_demeaned, "scaled:center"),
+                    x_mean = attr(X_scaled, "scaled:center"),
+                    x_sd = attr(X_scaled, "scaled:scale"))
+
   class(lasso_obj) <- "lasso"
 
   return(lasso_obj)
