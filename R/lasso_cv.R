@@ -1,7 +1,15 @@
-#' Wrapper Function for the regmodelsuit package.
+#' Calculates the Lambda for LASSO with m-fold Cross Validation
 #'
+#' @param X Dataset X has the class "matrix".
+#' @param y Target variable y has the class "matrix".
+#' @param M Split X into M-many equally sized Groups.
+#' m = 5 or m = 10 is recommended. The default is m = 10.
+#' @param lambda Lambda is an atomic vector of double values.
+#' cross_validation will find the optimal lambda among those. If no lambda is chosen,
+#' then a default range of lambdas will be tested.
 #'
-#' @return List including minimum lambda
+#' @return A list with the mean squared prediction error, the optimal lambda and
+#' the coefficients of the chosen regression model with the optimal lambda.
 
 
 # This is just a helper function for a more efficient calculation
@@ -31,7 +39,6 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
     while(max_abs_beta_diff > tol) {
 
       beta_old <- beta
-
       for (j in 1:p) {
         # 1
         r <- y - X_scaled[ , -j] %*% beta[-j]
@@ -61,7 +68,13 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
 
 
-lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
+lasso_cv <- function(X, y, m = 10, lambda, iter = 1e-07) {
+
+
+  # Randomize order of data
+  random_order <- sample(1:nrow(X))
+  X <- X[random_order,]
+  y <- y[random_order]
 
   # Create m folds
   folds <- cut(seq(1,nrow(X)),breaks=m,labels=FALSE)
@@ -71,30 +84,31 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
 
   lambda_min <- rep(0,m)
 
-  beta <- matrix(nrow = p, ncol = nridge)
-  mspe_matrix <- matrix(nrow = m, ncol = nridge)
+  if(missing(lambda)) {
+    # specify a lambda grid. log transformation to favor smaller values
+    ridge_rat_max = 50
+    ridge_rat_min = 0.002
 
+    log_min = log(ridge_rat_min)
+    log_max = log(ridge_rat_max)
 
+    step = (log_max-log_min)/(100-1)
 
-  # specify a lambda grid. log transformation to favour smaller values
-  ridge_rat_max = 50
-  ridge_rat_min = 0.002
+    log_ridge_rat_vec = seq(log_min,log_max,by = step)
+    ridge_rat_vec = exp(log_ridge_rat_vec)
 
-  log_min = log(ridge_rat_min)
-  log_max = log(ridge_rat_max)
+    # scale by sample size n
+    lambda = ridge_rat_vec * 100
+  }
 
-  step = (log_max-log_min)/(nridge-1)
+  beta <- matrix(nrow = p, ncol = length(lambda))
 
-  log_ridge_rat_vec = seq(log_min,log_max,by = step)
-  ridge_rat_vec = exp(log_ridge_rat_vec)
-
-  # scale by sample size n
-  lambda = ridge_rat_vec * nridge
-
+  # Mean square prediction error of each validation
+  mspe_matrix <- matrix(nrow = m, ncol = length(lambda))
 
   # Perform m-fold cross validation
   for(i in 1:m){
-    #Segement data
+    # Segment data
     Indexes <- which(folds==i,arr.ind=TRUE)
 
     testData <- X[Indexes, ]
@@ -107,11 +121,14 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
 
     x_reg = scale(trainData) # standardize
     y_reg = scale(ytrainData,scale = FALSE) # demean
+
+    # --- Perform LASSO Regression --- #
+    # Funktionsfabrik
     lasso_estimator <- lasso_cv_calculation(x_reg, y_reg)
 
     # Estimate coefficients for all lambdas
 
-    for (l in 1:nridge) {
+    for (l in 1:length(lambda)) {
       beta[ , l] <- lasso_estimator(lambda[l])
     }
 
@@ -126,7 +143,7 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
     # Scale the out of sample X by the mean and sd of the training data X
     test_data_scaled <- (testData - x_mean) / x_sd
 
-    # This is a n x nridge matrix
+    # This is a n x length(lambda) matrix
     out_of_sample_predicted_y <- apply(beta, 2, function(beta) {
       y_mean + test_data_scaled %*% beta
     })
@@ -143,9 +160,13 @@ lasso_cv <- function(X, y, m = 10, iter = 1e-07, nridge = 100) {
 
    min_lambda = lambda[min_lambda_index]
 
-   returnList <- list(nridge = nridge,
-                      lambda_grid= lambda,
-                      min_lambda = min_lambda,
-                      m_folds = m)
+   # Estimate the model once again with the optimal lambda
+   beta_final <- lasso_estimator(lambda[min_lambda_index])
+
+   returnList <- list(lambda_grid= lambda,
+                      cv_lambda = min_lambda,
+                      m_folds = m,
+                      MSPE = MSPE_cv[min_lambda_index],
+                      final_model_coef = beta_final)
    return(returnList)
 }
