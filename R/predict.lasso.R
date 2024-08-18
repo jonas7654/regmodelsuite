@@ -15,6 +15,10 @@ predict.lasso <- function(object , newobject = NULL) {
 
   # Check if newdata is provided
   if (!is.null(newdata)) {
+
+    stopifnot("newdata must be a dataframe" = is.data.frame(newdata))
+
+
     # Ensure newdata has the correct dimensions
     stopifnot("wrong dimensions" = (ncol(newdata) == ncol(object$model)))
 
