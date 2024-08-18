@@ -19,7 +19,7 @@ predict.LAR <- function(object , newobject = NULL) {
     stopifnot("wrong dimensions" = (ncol(newdata) == ncol(object$model)))
 
     # standardize newdata
-    newdata_scaled <- scale(newdata, center = mean_x, scale = sd_x)
+    newdata_scaled <- scale(newdata, center = means_X, scale = sds_X)
 
     X <- as.matrix(newdata_scaled)
   } else {
