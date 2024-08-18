@@ -1,0 +1,35 @@
+#' @export
+
+
+predict.lasso <- function(object , newobject = NULL) {
+  stopifnot("please provide a lasso object"  = inherits(object , "lasso"))
+
+
+
+  beta <- object$coefficients
+  mean_y <- object$mean_y
+  means_X <- object$mean_x  # Mean of training data used for standardization
+  sds_X <- object$sd_x      # Standard deviation of training data used for standardization
+  n <- object$n
+
+
+  # Check if newdata is provided
+  if (!is.null(newdata)) {
+    # Ensure newdata has the correct dimensions
+    stopifnot("wrong dimensions" = (ncol(newdata) == ncol(object$model)))
+
+    # standardize newdata
+    newdata_scaled <- scale(newdata, center = mean_x, scale = sd_x)
+
+    X <- as.matrix(newdata_scaled)
+  } else {
+    # Use the original model data for prediction
+    X <- object$model
+  }
+
+
+  # Return predictions
+  y_hat <- mean_y + X %*% beta
+
+  return(y_hat)
+}
