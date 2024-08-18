@@ -1,17 +1,32 @@
-#' Wrapper Function for the regmodelsuit package.
+#' Wrapper function for the regmodelsuit package
 #'
 #' @param formula A formula object which specifies the model
 #' @param data A data frame which contains the corresponding variables
-#' @param model Specifies the model to be estimated.
-#'   c("ridge","lasso","forward","backward","LAR")
-#' @param lambda penalty parameter for ridge and lasso estimation. If cv = TRUE
-#'   lambda will be ignored all of them are tested to find the optimal lambda
-#'   with regard to the chosen regmodel
-#' @param nlambda
-#' @param model Logical value which specifies if cross validation for lambda
-#'   should be used
+#' @param model A string with the model to be estimated. Following models are
+#'    supported
+#' \itemize{
+#'    \item "ridge"
+#'    \item "lasso"
+#'    \item "forward"
+#'    \item "backward"
+#'    \item "LAR"
+#' }
+#' @param lambda A numeric value which defines the penalty parameter for ridge
+#'    and lasso estimation. \cr
+#'    If using cross validation, it is a numeric vector with at least length 2.
+#'    If no lambda is given, cross validation will generate default values.
+#' @param cv A logical value which specifies if cross validation should be used.
+#' @param m An integer for the amount of folds when using cross validation.
+#' @param nlambda An integer that defines the amount of values that are generated
+#'    as default lambdas in cross validation.
 #'
-#' @return Model List
+#'
+#'    For more details regarding cross validation and the variables
+#'    see the cv vignette: \cr
+#'    \code{vignette("cv", package = "regmodelsuite")}
+#'
+#' @return S3 object of the chosen regression model class, containing different
+#'    informations.
 #' @export
 
 # TODO
@@ -40,16 +55,17 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
               is.character(model) && model %in% valid_models)
 
   if (model %in% c("ridge", "lasso")) {
-    stopifnot("lambda must be numeric" = is.numeric(lambda))
     if (!cv) {
       stopifnot("Please specify a lambda" = !is.null(lambda))
 
+      stopifnot("lambda must be numeric" = is.numeric(lambda))
       stopifnot("lambda must be a single number" = length(lambda) == 1)
       stopifnot("lambda may not be negative" = lambda >= 0)
     }
     # otherwise, cv is TRUE
     # so, we can immediately check for lambda
     else if(!is.null(lambda)) {
+        stopifnot("lambda must be numeric" = is.numeric(lambda))
         stopifnot("lambda values must be a vector" = is.vector(lambda))
         stopifnot("lambda values may not be negative" = all(lambda >= 0))
         stopifnot("Provide either a vector with length >= 2 or no lambda for cross validation.

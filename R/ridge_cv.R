@@ -1,26 +1,4 @@
-#' m-fold Cross Validation with ridge regression
-#'
-#' This function calculates the lambda for which the mean squared prediction error
-#' of ridge regression is the smallest for  a given predictor matrix `X` and
-#' response vector `y`.
-#'
-#' @param X A matrix of predictor variables.
-#' @param y A vector of response values.
-#' @param m An integer. Split X into m-many nearly equally sized groups.
-#' m = 5 or m = 10 is recommended. The default is m = 10.
-#' @param lambda An atomic vector of double values.
-#' cross_validation will find the optimal lambda among those. If no lambda is chosen,
-#' then a default range of lambdas will be used.
-#'
-#' @return S3 object with class ridge_cv, containing the optimal lambda and other
-#' information.
-
-
-################################################################################
-# Version 3
-
-
-ridge_cv <- function(X, y, m, lambda, nlambda) {
+ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
   # --- Errors and Warnings --- #
 
   stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))

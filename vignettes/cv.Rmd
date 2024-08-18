@@ -1,0 +1,91 @@
+---
+title: "Cross Validation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Cross Validation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(regmodelsuite)
+```
+
+## Example Data
+
+Before using regmodelsuite, we generate an arbitrary data set:
+
+```{r}
+# Erstelle einen Datensatz mit 100 Beobachtungen und 10 Prädiktoren
+n <- 100
+p <- 10
+
+# Zufällige Werte für Prädiktoren (X)
+X <- matrix(rnorm(n * p), n, p)
+
+# Wahre Koeffizienten
+beta <- c(1, 0.5, -0.5, 0.7, -0.2, rep(0, p - 5))
+
+# Zielvariable y mit etwas Rauschen
+y <- X %*% beta + rnorm(n)
+
+# Konvertiere in einen DataFrame
+data <- data.frame(y = y, X)
+```
+
+## How to use cross validation in regmodelsuite
+
+Regmodelsuite provides the wrapper function regmodel(...) which executes whichever
+model is chosen. To execute cross validation, set cv = TRUE.
+
+```{r}
+regmodel(formula = y ~ ., data = data, model = "ridge", cv = TRUE)
+```
+
+In this example, we chose the ridge model for cross validation. The regmodelsuite
+package supports cross validation for lasso and ridge. 
+
+## Optional arguments
+
+Internally, regmodelsuite uses m-fold cross validation, which means, that the data
+is split into m nearly equally sized groups. 
+Thus, m > 1 and m <= nrow(data) must be satisfied. The larger m is, the longer 
+the cross validation will take.
+Typically, m = 10 or m = 5 are recommended and the default in regmodelsuite is m = 10.
+
+m can be set, if choosing cross validation or else it will just be ignored:
+
+```{r}
+regmodel(formula = y ~ ., data = data, model = "ridge", m = 5, cv = TRUE)
+```
+
+Cross validation tries to find the lambda, that minimizes the mean squared prediction error
+for the chosen model. By default, if no list of lambdas is provided, a log 
+transformed range is used. The purpose of this is to favor smaller lambdas more precisely
+because larger lambdas theoretically lead to higher bias. 
+
+nlambda can be used to adjust the amount of lambdas in the default lambda grid, 
+but the default is 100.
+
+```{r}
+regmodel(formula = y ~ ., data = data, model = "ridge", cv = TRUE, nlambda = 10)
+```
+
+It is also possible to pass in your own lambda vector, for example if you do not
+want to use a log transformed lambda grid.
+
+```{r}
+regmodel(formula = y ~ ., data = data, model = "ridge", lambda = seq(0.2, 5, by = 0.2), cv = TRUE)
+```
+
+However, regmodel with exist with an error, if lambda is just a single value, 
+because there would be only on potential candidate for the optimal lambda. 
+
+

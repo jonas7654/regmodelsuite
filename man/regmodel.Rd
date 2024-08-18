@@ -2,7 +2,7 @@
 % Please edit documentation in R/regmodel.R
 \name{regmodel}
 \alias{regmodel}
-\title{Wrapper Function for the regmodelsuit package.}
+\title{Wrapper function for the regmodelsuit package}
 \usage{
 regmodel(
   formula = NULL,
@@ -10,6 +10,8 @@ regmodel(
   model = NULL,
   lambda = NULL,
   cv = FALSE,
+  m = 10,
+  nlambda = 100,
   ...
 )
 }
@@ -18,16 +20,36 @@ regmodel(
 
 \item{data}{A data frame which contains the corresponding variables}
 
-\item{model}{Logical value which specifies if cross validation for lambda
-should be used}
+\item{model}{A string with the model to be estimated. Following models are
+supported
+\itemize{
+\item "ridge"
+\item "lasso"
+\item "forward"
+\item "backward"
+\item "LAR"
+}}
 
-\item{lambda}{penalty parameter for ridge and lasso estimation. If cv = TRUE
-lambda will be ignored all of them are tested to find the optimal lambda
-with regard to the chosen regmodel}
+\item{lambda}{A numeric value which defines the penalty parameter for ridge
+and lasso estimation. \cr
+If using cross validation, it is a numeric vector with at least length 2.
+If no lambda is given, cross validation will generate default values.}
+
+\item{cv}{A logical value which specifies if cross validation should be used.}
+
+\item{m}{An integer for the amount of folds when using cross validation.}
+
+\item{nlambda}{An integer that defines the amount of values that are generated
+as default lambdas in cross validation.
+
+For more details regarding cross validation and the variables
+see the cv vignette: \cr
+\code{vignette("cv", package = "regmodelsuite")}}
 }
 \value{
-Model List
+S3 object of the chosen regression model class, containing different
+informations.
 }
 \description{
-Wrapper Function for the regmodelsuit package.
+Wrapper function for the regmodelsuit package
 }

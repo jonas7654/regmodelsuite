@@ -1,22 +1,3 @@
-#' Ridge regression
-#'
-#' This function calculates the coefficients of a ridge regression model
-#' for a given predictor matrix `X` and response vector `y`.
-#'
-#' @param X A matrix of predictor variables.
-#' @param y A vector of response values.
-#' @param lambda A numeric value for the regularization parameter.
-#'
-#' @return S3 object with class ridge, containing the coefficients and other information.
-#'
-#' @examples
-#' \preformatted{set.seed(21)
-#' X <- matrix(runif(100 * 10), 100, 10)
-#' y <- X %*% runif(10, min = -1, max = 1) + rnorm(100, mean = 0, sd = 0.3)
-#' ridge(X,y,0.1)
-#' }
-
-
 ridge <- function(X,y, lambda = 0){
 
   # standardize coefficients

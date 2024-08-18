@@ -3,6 +3,8 @@
 S3method(coef,lasso)
 S3method(plot,LAR)
 S3method(plot,stepwise_selection)
+S3method(predict,LAR)
+S3method(predict,lasso)
 S3method(predict,ridge)
 S3method(print,LAR)
 S3method(print,stepwise_selection)

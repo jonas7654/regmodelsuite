@@ -1,13 +1,3 @@
-#' Calculate the Lasso estimates
-#'
-#' @param X data frame containing the covariates
-#' @param Y response vector
-#' @param lambda penalty parameter ($\lambda > 0$)
-#' @param tol tolerance level for convergence (default = 1e-5)
-#'
-#' @return list ..... TODO
-
-
 lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
   if (lambda == 0) {

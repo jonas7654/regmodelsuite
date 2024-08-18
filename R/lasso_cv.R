@@ -1,17 +1,3 @@
-#' Calculates the Lambda for LASSO with m-fold Cross Validation
-#'
-#' @param X Dataset X has the class "matrix".
-#' @param y Target variable y has the class "matrix".
-#' @param M Split X into M-many equally sized Groups.
-#' m = 5 or m = 10 is recommended. The default is m = 10.
-#' @param lambda Lambda is an atomic vector of double values.
-#' cross_validation will find the optimal lambda among those. If no lambda is chosen,
-#' then a default range of lambdas will be tested.
-#'
-#' @return A list with the mean squared prediction error, the optimal lambda and
-#' the coefficients of the chosen regression model with the optimal lambda.
-
-
 # This is just a helper function for a more efficient calculation
 lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
@@ -68,7 +54,7 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
 
 
-lasso_cv <- function(X, y, m, lambda, nlambda, iter = 1e-07) {
+lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
   # --- Errors and Warnings --- #
 
   stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))
