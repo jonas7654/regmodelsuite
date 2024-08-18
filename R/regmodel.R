@@ -48,7 +48,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
                   length(lambda) != 1)
     }
   }
-  else {
+  else if (!model %in% c("forward", "backward")) {
     valid_models <- c("ridge", "lasso", "forward", "backward", "LAR")
     stopifnot("Please select a valid model. See ?regmodel" =
                 is.character(model) && model %in% valid_models)
@@ -58,7 +58,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     stopifnot("lambda must be numeric" = is.numeric(lambda))
     stopifnot("lambda must be a single number" = length(lambda) == 1)
     stopifnot("lambda may not be negative" = lambda >= 0)
-    }
+  }
 
   if (!is.null(data)) {
     stopifnot("data must be of type data.frame" = is.data.frame(data))

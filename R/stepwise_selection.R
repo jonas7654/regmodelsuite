@@ -3,11 +3,11 @@
 #' @param X Dataset X
 #' @param y Dataset y
 #' @param n_predicors Amount of predictors to select
-#' @param model Modeling function
+#' @param model_fct Modeling function with formula and data parameter (like lm)
 #' @param verbose Whether to print information of the selection process
 #'
 #' @return A stepwise_selection object
-forward_selection <- function(X, y, n_predictors, model = lm,
+forward_selection <- function(X, y, n_predictors, model_fct = lm,
                                verbose = TRUE) {
 
   stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
@@ -26,7 +26,7 @@ forward_selection <- function(X, y, n_predictors, model = lm,
     if(verbose)
       cat(sprintf("%dth iteration:\n", i))
 
-    best_loss <- NULL
+    best_error <- NULL
 
     for(p in seq_along(unused_predictors)) {
 
@@ -37,29 +37,29 @@ forward_selection <- function(X, y, n_predictors, model = lm,
       formula <- as.formula(paste(formula_start,
                                   paste(cur_predictors, collapse="+")))
 
-      fit <- model(formula, X)
+      fit <- model_fct(formula = formula, data = X)
 
       # Predicting the data with the fitted model
       prediction <- predict(fit, X)
 
-      # Calculating squared loss
-      loss <- sum((y - prediction) ^ 2) / length(prediction)
+      # Calculating squared error
+      error <- sum((y - prediction) ^ 2) / length(prediction)
 
       if(verbose) {
-        cat(sprintf("  + %s: %f\n", unused_predictors[p], loss))
+        cat(sprintf("  + %s: %f\n", unused_predictors[p], error))
       }
 
-      # Checking if the loss is currently the best
-      if(loss < best_loss || is.null(best_loss)) {
-        best_loss <- loss
+      # Checking if the error is currently the best
+      if(error < best_error || is.null(best_error)) {
+        best_error <- error
         best_predictor <- p
         best_fit <- fit
       }
     }
 
     if(verbose) {
-      cat(sprintf("Added predicor '%s', Loss: %f\n\n",
-                    unused_predictors[best_predictor], best_loss))
+      cat(sprintf("Added predicor '%s', Error: %f\n\n",
+                    unused_predictors[best_predictor], best_error))
     }
 
     # Removing and adding the selected predictor from the lists
@@ -69,7 +69,7 @@ forward_selection <- function(X, y, n_predictors, model = lm,
 
   results <- list(model = best_fit,
                   predictors = used_predictors,
-                  loss = best_loss,
+                  error = best_error,
                   direction = "forward")
 
   class(results) <- "stepwise_selection"
@@ -82,11 +82,11 @@ forward_selection <- function(X, y, n_predictors, model = lm,
 #' @param X Dataset X
 #' @param y Dataset y
 #' @param n_predicors Amount of predictors to select
-#' @param model Modeling function
+#' @param model_fct Modeling function with formula and data parameter (like lm)
 #' @param verbose Whether to print information of the selection process
 #'
 #' @return A stepwise_selection object
-backward_selection <- function(X, y, n_predictors, model = lm, verbose = TRUE) {
+backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRUE) {
 
   stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
 
@@ -103,24 +103,24 @@ backward_selection <- function(X, y, n_predictors, model = lm, verbose = TRUE) {
 
   for(i in 1:iterations) {
 
-    best_loss <- NULL
+    best_error <- NULL
 
     # Creating formula object with the new combination
     formula <- as.formula(paste(formula_start,
                                   paste(used_predictors, collapse="+")))
 
-    fit <- model(formula, X)
+    fit <- model_fct(formula = formula, data = X)
 
     # Predicting the data with the fitted model
     prediction <- predict(fit, X)
 
-    # Calculating squared loss
-    loss <- sum((y - prediction) ^ 2) / length(prediction)
+    # Calculating squared error
+    error <- sum((y - prediction) ^ 2) / length(prediction)
 
     if(verbose)
-      cat(sprintf("%f\n\n", loss))
+      cat(sprintf("%f\n\n", error))
 
-    # The last iteration is just for fitting the model and calculating the loss
+    # The last iteration is just for fitting the model and calculating the error
     if(i == iterations)
       break
 
@@ -142,7 +142,7 @@ backward_selection <- function(X, y, n_predictors, model = lm, verbose = TRUE) {
     lowest_score <- scores[lowest_which]
 
     if(verbose)
-      cat(sprintf("Removed predictor '%s' with Z-score: %f. Loss: ",
+      cat(sprintf("Removed predictor '%s' with Z-score: %f. Error: ",
                   lowest_name, lowest_score))
 
     # Removing the predictor with the lowest Z-score from the used predictors
@@ -151,7 +151,7 @@ backward_selection <- function(X, y, n_predictors, model = lm, verbose = TRUE) {
 
   results <- list(model = fit,
                   predictors = used_predictors,
-                  loss = loss,
+                  error = error,
                   direction = "backward")
 
   class(results) <- "stepwise_selection"
