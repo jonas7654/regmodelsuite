@@ -38,7 +38,6 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   valid_models <- c("ridge", "lasso", "forward", "backward", "LAR")
   stopifnot("Please select a valid model" =
               is.character(model) && model %in% valid_models)
-  stopifnot("Please specify a lambda" = !is.null(lambda))
 
   if (model %in% c("ridge", "lasso")) {
     stopifnot("lambda must be numeric" = is.numeric(lambda))

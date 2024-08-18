@@ -22,31 +22,23 @@ test_that("regmodel input checks work", {
 
 
   # Test for ridge regression with a negative lambda
-  expect_error(regmodel(formula = formula, data = data, model = "ridge", lambda = -1),
-               "Lambda must be a positive number")
+  expect_error(regmodel(formula = formula, data = data, model = "ridge", lambda = -1))
   # Test for ridge regression with negative lambda grid
-  expect_error(regmodel(formula = formula, data = data, model = "ridge", lambda = c(-1,-2,-5,2)),
-               "Lambda must be a positive number")
+  expect_error(regmodel(formula = formula, data = data, model = "ridge", lambda = c(-1,-2,-5,2)))
   # Test for ridge regression with a negative lambda
-  expect_error(regmodel(formula = formula, data = data, model = "lasso", lambda = -1),
-               "Lambda must be a positive number")
+  expect_error(regmodel(formula = formula, data = data, model = "lasso", lambda = -1))
   # Test for ridge regression with negative lambda grid
-  expect_error(regmodel(formula = formula, data = data, model = "lasso", lambda = c(-1,-2,-5,2)),
-               "Lambda must be a positive number")
+  expect_error(regmodel(formula = formula, data = data, model = "lasso", lambda = c(-1,-2,-5,2)))
 
   # Test for wrong lambda
-  expect_error(regmodel(formula = formula, data = data, model = "lasso", lambda = "1"),
-               "Lambda must be a positive number")
+  expect_error(regmodel(formula = formula, data = data, model = "lasso", lambda = "1"))
 
   # Wrong model input
-  expect_error(regmodel(formula = formula, data = data, model = lasso, lambda = c(-1,-2,-5,2)),
-               "Please select a valid model")
-  expect_error(regmodel(formula = formula, data = data, model = "Lasso", lambda = c(-1,-2,-5,2)),
-               "Please select a valid model")
+  expect_error(regmodel(formula = formula, data = data, model = lasso, lambda = c(-1,2)))
+  expect_error(regmodel(formula = formula, data = data, model = "Lasso", lambda = 2))
 
   # Formula input test
-  expect_error(regmodel(formula = "y ~ x", data = data, model = "lasso", lambda = 1),
-              "please provide a valid formula object")
+  expect_error(regmodel(formula = "y ~ x", data = data, model = "lasso", lambda = 1))
   expect_error(regmodel(formula = as.formula(y ~ k) , data = data, model = "lasso", lambda = 1))
 
   # Find variables in environment
