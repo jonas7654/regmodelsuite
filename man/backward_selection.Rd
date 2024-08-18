@@ -4,14 +4,14 @@
 \alias{backward_selection}
 \title{Finds a subset of predictors using backward selection}
 \usage{
-backward_selection(X, y, n_predictors, model = lm, verbose = TRUE)
+backward_selection(X, y, n_predictors, model_fct = lm, verbose = TRUE)
 }
 \arguments{
 \item{X}{Dataset X}
 
 \item{y}{Dataset y}
 
-\item{model}{Modeling function}
+\item{model_fct}{Modeling function with formula and data parameter (like lm)}
 
 \item{verbose}{Whether to print information of the selection process}
 

@@ -14,6 +14,7 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
 
   unused_predictors <- colnames(X)
   used_predictors <- c()
+  errors <- c()
   iterations <- min(n_predictors, ncol(X))
 
   # Combining X and y and converting to data frame
@@ -62,6 +63,8 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
                     unused_predictors[best_predictor], best_error))
     }
 
+    errors <- c(errors, best_error)
+
     # Removing and adding the selected predictor from the lists
     used_predictors <- c(used_predictors, unused_predictors[best_predictor])
     unused_predictors <- unused_predictors[-best_predictor]
@@ -69,8 +72,10 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
 
   results <- list(model = best_fit,
                   predictors = used_predictors,
+                  direction = "forward",
                   error = best_error,
-                  direction = "forward")
+                  errors = errors,
+                  start_predictors = 1)
 
   class(results) <- "stepwise_selection"
 
@@ -94,6 +99,8 @@ backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRU
             = nrow(X) > ncol(X))
 
   used_predictors <- colnames(X)
+
+  errors <- c()
   iterations <- length(used_predictors) - n_predictors + 1
 
   # Combining X and y and converting to data frame
@@ -111,14 +118,19 @@ backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRU
 
     fit <- model_fct(formula = formula, data = X)
 
-    # Predicting the data with the fitted model
-    prediction <- predict(fit, X)
+    # First error is irrelevant
+    if(i != 1) {
+      # Predicting the data with the fitted model
+      prediction <- predict(fit, X)
 
-    # Calculating squared error
-    error <- sum((y - prediction) ^ 2) / length(prediction)
+      # Calculating squared error
+      error <- sum((y - prediction) ^ 2) / length(prediction)
 
-    if(verbose)
-      cat(sprintf("%f\n\n", error))
+      errors <- c(errors, error)
+
+      if(verbose)
+        cat(sprintf("%f\n\n", error))
+    }
 
     # The last iteration is just for fitting the model and calculating the error
     if(i == iterations)
@@ -152,9 +164,35 @@ backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRU
   results <- list(model = fit,
                   predictors = used_predictors,
                   error = error,
-                  direction = "backward")
+                  direction = "backward",
+                  errors = errors,
+                  start_predictors = ncol(X) - 2)
 
   class(results) <- "stepwise_selection"
 
   results
+}
+
+#' @export
+print.stepwise_selection <- function(object) {
+  cat("Stepwise selection object\n")
+  cat("-------------------------\n")
+  cat(sprintf("Selected predictors: %s\n",
+              paste(object$predictors, collapse=", ")))
+  cat(sprintf("Error: %f\n", object$error))
+  cat(sprintf("Direction: %s", object$direction))
+}
+
+#' @export
+plot.stepwise_selection <- function(object) {
+  plot_data <- data.frame(x = length(object$predictors):object$start_predictors,
+                          y = object$errors)
+
+  ggplot(plot_data, aes(x, y)) +
+    xlab("Predictor Subset Size") +
+    ylab("Error") +
+    geom_point(size = 3) +
+    geom_line() +
+    theme_minimal() +
+    ggtitle("Stepwise selection")
 }
