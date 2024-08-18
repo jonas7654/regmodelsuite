@@ -57,13 +57,13 @@ test_that("regmodel input checks work", {
   expect_error(regmodel(formula , data = data , model = "ridge", lambda = c(1, -2), cv = 20))
   expect_error(regmodel(formula , data = data , model = "ridge", lambda = c(1, -2), cv = "TRUE"))
 
-  expect_warning(regmodel(formula , data = data , model = "lasso", cv = T, lambda = 1))
+  expect_error(regmodel(formula , data = data , model = "lasso", cv = T, lambda = 1))
   expect_no_warning(regmodel(formula , data = data , model = "lasso", cv = T, lambda = c(1,2,3)))
 
-  # Lambda should be ignored
-  expect_no_error(regmodel(formula , data = data ,model = "backward", lambda = c(1, -2), cv = T))
-  expect_no_error(regmodel(formula , data = data ,model = "forward", lambda = c(1, -2), cv = T))
-  expect_no_error(regmodel(formula , data = data ,model = "LAR", lambda = c(1, -2), cv = T))
+  #
+  expect_error(regmodel(formula , data = data ,model = "backward", lambda = c(1, -2), cv = T))
+  expect_error(regmodel(formula , data = data ,model = "forward", lambda = c(1, -2), cv = T))
+  expect_error(regmodel(formula , data = data ,model = "LAR", lambda = c(1, -2), cv = T))
 
 })
 
