@@ -68,26 +68,13 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
 
 
-lasso_cv <- function(X, y, m = 10, lambda = NULL, iter = 1e-07) {
+lasso_cv <- function(X, y, m, lambda, nlambda, iter = 1e-07) {
   # --- Errors and Warnings --- #
 
-  m <- as.integer(m)
-  stopifnot("m has to be 2 or larger" = m > 1)
   stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))
 
   if (nrow(X) %% m != 0) {
     warning("nrow(X) is not divisible by m. Will divide X into m nearly equally sized folds.")
-  }
-
-  if (!is.null(lambda)) {
-    stopifnot("lambda values must be numeric" = is.numeric(lambda))
-    stopifnot("lambda must be a vector" = is.vector(lambda))
-    stopifnot("lambda must not contain negative values" = all(lambda >= 0))
-
-
-    if (any(lambda == 0)) {
-      warning("lambda contains 0. Ridge regression with lambda = 0 is equivalent to Least Squares Regression.")
-    }
   }
 
   stopifnot("X and y must have the same amount of rows" = nrow(X) == nrow(y))
@@ -113,22 +100,22 @@ lasso_cv <- function(X, y, m = 10, lambda = NULL, iter = 1e-07) {
     log_min = log(ridge_rat_min)
     log_max = log(ridge_rat_max)
 
-    step = (log_max-log_min)/(100-1)
+    step = (log_max-log_min)/(nlambda-1)
 
     log_ridge_rat_vec = seq(log_min,log_max,by = step)
     ridge_rat_vec = exp(log_ridge_rat_vec)
 
     # scale by sample size n
-    lambda = ridge_rat_vec * 100
+    lambda = ridge_rat_vec * nlambda
   }
 
   # Define a progress bar
   pb = txtProgressBar(min = 0, max = m, initial = 0, , style = 3)
 
-  beta <- matrix(nrow = p, ncol = length(lambda))
+  beta <- matrix(nrow = p, ncol = nlambda)
 
   # Mean square prediction error of each validation
-  mspe_matrix <- matrix(nrow = m, ncol = length(lambda))
+  mspe_matrix <- matrix(nrow = m, ncol = nlambda)
 
   # Perform m-fold cross validation
   for(i in 1:m){
@@ -152,7 +139,7 @@ lasso_cv <- function(X, y, m = 10, lambda = NULL, iter = 1e-07) {
 
     # Estimate coefficients for all lambdas
 
-    for (l in 1:length(lambda)) {
+    for (l in 1:nlambda) {
       beta[ , l] <- lasso_estimator(lambda[l])
     }
 
@@ -189,7 +176,7 @@ lasso_cv <- function(X, y, m = 10, lambda = NULL, iter = 1e-07) {
 
   min_lambda = lambda[min_lambda_index]
 
-  returnList <- list(nridge = length(lambda),
+  returnList <- list(nlambda = nlambda,
                      lambda_grid = lambda,
                      min_lambda = min_lambda,
                      m_folds = m,

@@ -7,6 +7,7 @@
 #' @param lambda penalty parameter for ridge and lasso estimation. If cv = TRUE
 #'   lambda will be ignored all of them are tested to find the optimal lambda
 #'   with regard to the chosen regmodel
+#' @param nlambda
 #' @param model Logical value which specifies if cross validation for lambda
 #'   should be used
 #'
@@ -23,7 +24,7 @@
 # explain lambda grid
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
-                     cv = FALSE, ...) {
+                     cv = FALSE, m = 10, nlambda = 100, ...) {
 
   # Input checks
   stopifnot("Please provide a valid formula object" =
@@ -33,31 +34,36 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   stopifnot("cv must be a single logical value" = length(cv) == 1)
 
-  if (cv) {
-    valid_models <- c("ridge", "lasso")
-    stopifnot("Please select a valid model for cross validation. See ?regmodel" =
-                is.character(model) && model %in% valid_models)
+  ## better ?
+  valid_models <- c("ridge", "lasso", "forward", "backward", "LAR")
+  stopifnot("Please select a valid model" =
+              is.character(model) && model %in% valid_models)
+  stopifnot("Please specify a lambda" = !is.null(lambda))
 
-    # Otherwise, ridge_cv will generate default lambda
-    if (!missing(lambda)) {
-      stopifnot("lambda values must be numeric" = is.numeric(lambda))
-      stopifnot("lambda values must be a vector" = is.vector(lambda))
-      stopifnot("lambda values may not be negative" = all(lambda >= 0))
-      stopifnot("Provide either a vector with length >= 2 or no lambda for cross validation.
+  if (model %in% c("ridge", "lasso")) {
+    stopifnot("lambda must be numeric" = is.numeric(lambda))
+    if (!cv) {
+      stopifnot("Please specify a lambda" = !is.null(lambda))
+
+      stopifnot("lambda must be a single number" = length(lambda) == 1)
+      stopifnot("lambda may not be negative" = lambda >= 0)
+    }
+    # otherwise, cv is TRUE
+    # so, we can immediately check for lambda
+    else if(!is.null(lambda)) {
+        stopifnot("lambda values must be a vector" = is.vector(lambda))
+        stopifnot("lambda values may not be negative" = all(lambda >= 0))
+        stopifnot("Provide either a vector with length >= 2 or no lambda for cross validation.
     See ?ridge_cv or ?lasso_cv for details" =
-                  length(lambda) != 1)
+                    length(lambda) != 1)
+
+        stopifnot("m has to be numeric" = is.numeric(m))
+        m <- as.integer(m)
+        stopifnot("m has to be 2 or larger" = m > 1)
     }
   }
-  else if (!model %in% c("forward", "backward")) {
-    valid_models <- c("ridge", "lasso", "forward", "backward", "LAR")
-    stopifnot("Please select a valid model. See ?regmodel" =
-                is.character(model) && model %in% valid_models)
-
-    stopifnot("Please specify a lambda" = !is.null(lambda))
-
-    stopifnot("lambda must be numeric" = is.numeric(lambda))
-    stopifnot("lambda must be a single number" = length(lambda) == 1)
-    stopifnot("lambda may not be negative" = lambda >= 0)
+  else if (cv) {
+    stop("Please choose ridge or lasso if choosing cv")
   }
 
   if (!is.null(data)) {
@@ -130,12 +136,14 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   # Ridge call
   if (model == "ridge") {
     if (cv) {
-      if (!exists("m")) {
-        warning("No m was explicitly provided for cross validation. Proceeding with m = 10")
+      if (!is.null(lambda)) {
+        cv_results <- ridge_cv(X, y, m = 10, nlambda = length(lambda), lambda = lambda)
+        results <- cv_results
       }
-      # ... for optional m input
-      cv_results <- ridge_cv(X, y, lambda = lambda, ...)
-      results <- cv_results
+      else {
+        cv_results <- ridge_cv(X, y, m = 10)
+        results <- cv_results
+      }
     }
     else {
       fit <- ridge(X, y, lambda)
@@ -154,12 +162,14 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   # Lasso regression call
   else if (model == "lasso") {
     if (cv) {
-      if (!exists("m")) {
-        warning("No m was explicitly provided for cross validation. Proceeding with m = 10")
+      if (!is.null(lambda)) {
+        cv_results <- lasso_cv(X, y, m = 10, nlambda = length(lambda), lambda = lambda)
+        results <- cv_results
       }
-      # ... for optional m input
-      cv_results <- lasso_cv(X, y, lambda = lambda, ...)
-      results <- cv_results
+      else {
+        cv_results <- lasso_cv(X, y, m = 10)
+        results <- cv_results
+      }
     }
     else {
       fit <- lasso(X, y, lambda)

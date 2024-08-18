@@ -2,26 +2,28 @@
 % Please edit documentation in R/ridge_cv.R
 \name{ridge_cv}
 \alias{ridge_cv}
-\title{Calculates the Lambda for Ridge with m-fold Cross Validation}
+\title{m-fold Cross Validation with ridge regression}
 \usage{
-ridge_cv(X, y, m = 10, lambda)
+ridge_cv(X, y, m = 10, lambda = NULL)
 }
 \arguments{
-\item{X}{Dataset X has the class "matrix".}
+\item{X}{A matrix of predictor variables.}
 
-\item{y}{Target variable y has the class "matrix".}
+\item{y}{A vector of response values.}
 
-\item{lambda}{Lambda is an atomic vector of double values.
-cross_validation will find the optimal lambda among those. If no lambda is chosen,
-then a default range of lambdas will be tested.}
-
-\item{M}{Split X into M-many equally sized Groups.
+\item{m}{An integer. Split X into m-many nearly equally sized groups.
 m = 5 or m = 10 is recommended. The default is m = 10.}
+
+\item{lambda}{An atomic vector of double values.
+cross_validation will find the optimal lambda among those. If no lambda is chosen,
+then a default range of lambdas will be used.}
 }
 \value{
-A list with the mean squared prediction error, the optimal lambda and
-the coefficients of the chosen regression model with the optimal lambda.
+S3 object with class ridge_cv, containing the optimal lambda and other
+information.
 }
 \description{
-Calculates the Lambda for Ridge with m-fold Cross Validation
+This function calculates the lambda for which the mean squared prediction error
+of ridge regression is the smallest for  a given predictor matrix \code{X} and
+response vector \code{y}.
 }

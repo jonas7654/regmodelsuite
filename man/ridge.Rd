@@ -2,7 +2,7 @@
 % Please edit documentation in R/ridge.R
 \name{ridge}
 \alias{ridge}
-\title{Calculates the ridge regression}
+\title{Ridge regression}
 \usage{
 ridge(X, y, lambda = 0)
 }
@@ -14,9 +14,16 @@ ridge(X, y, lambda = 0)
 \item{lambda}{A numeric value for the regularization parameter.}
 }
 \value{
-A vector of ridge regression coefficients.
+S3 object with class ridge, containing the coefficients and other information.
 }
 \description{
 This function calculates the coefficients of a ridge regression model
 for a given predictor matrix \code{X} and response vector \code{y}.
+}
+\examples{
+\preformatted{set.seed(21)
+X <- matrix(runif(100 * 10), 100, 10)
+y <- X \%*\% runif(10, min = -1, max = 1) + rnorm(100, mean = 0, sd = 0.3)
+ridge(X,y,0.1)
+}
 }

@@ -1,41 +1,32 @@
-#' Calculates the Lambda for Ridge with m-fold Cross Validation
+#' m-fold Cross Validation with ridge regression
 #'
-#' @param X Dataset X has the class "matrix".
-#' @param y Target variable y has the class "matrix".
-#' @param M Split X into M-many equally sized Groups.
+#' This function calculates the lambda for which the mean squared prediction error
+#' of ridge regression is the smallest for  a given predictor matrix `X` and
+#' response vector `y`.
+#'
+#' @param X A matrix of predictor variables.
+#' @param y A vector of response values.
+#' @param m An integer. Split X into m-many nearly equally sized groups.
 #' m = 5 or m = 10 is recommended. The default is m = 10.
-#' @param lambda Lambda is an atomic vector of double values.
+#' @param lambda An atomic vector of double values.
 #' cross_validation will find the optimal lambda among those. If no lambda is chosen,
-#' then a default range of lambdas will be tested.
+#' then a default range of lambdas will be used.
 #'
-#' @return A list with the mean squared prediction error, the optimal lambda and
-#' the coefficients of the chosen regression model with the optimal lambda.
+#' @return S3 object with class ridge_cv, containing the optimal lambda and other
+#' information.
 
 
 ################################################################################
 # Version 3
 
 
-ridge_cv <- function(X, y, m = 10, lambda = NULL) {
+ridge_cv <- function(X, y, m, lambda, nlambda) {
   # --- Errors and Warnings --- #
 
-  m <- as.integer(m)
-  stopifnot("m has to be 2 or larger" = m > 1)
   stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))
 
   if (nrow(X) %% m != 0) {
     warning("nrow(X) is not divisible by m. Will divide X into m nearly equally sized folds.")
-  }
-
-  if (!is.null(lambda)) {
-    stopifnot("lambda values must be numeric" = is.numeric(lambda))
-    stopifnot("lambda must be a vector" = is.vector(lambda))
-    stopifnot("lambda must not contain negative values" = all(lambda >= 0))
-
-
-    if (any(lambda == 0)) {
-      warning("lambda contains 0. Ridge regression with lambda = 0 is equivalent to Least Squares Regression.")
-    }
   }
 
   stopifnot("X and y must have the same amount of rows" = nrow(X) == nrow(y))
@@ -60,22 +51,22 @@ ridge_cv <- function(X, y, m = 10, lambda = NULL) {
     log_min = log(ridge_rat_min)
     log_max = log(ridge_rat_max)
 
-    step = (log_max-log_min)/(100-1)
+    step = (log_max-log_min)/(nlambda-1)
 
     log_ridge_rat_vec = seq(log_min,log_max,by = step)
     ridge_rat_vec = exp(log_ridge_rat_vec)
 
     # scale by sample size n
-    lambda = ridge_rat_vec * 100
+    lambda = ridge_rat_vec * nlambda
   }
 
   # Define a progress bar
   pb = txtProgressBar(min = 0, max = m, initial = 0, , style = 3)
 
-  beta <- matrix(nrow = ncol(X), ncol = length(lambda))
+  beta <- matrix(nrow = ncol(X), ncol = nlambda)
 
   # Mean square prediction error of each validation
-  mspe_temp <- matrix(NA, m, length(lambda))
+  mspe_temp <- matrix(NA, m, nlambda)
 
   # Perform m-fold cross validation
   for(i in 1:m) {
@@ -99,7 +90,7 @@ ridge_cv <- function(X, y, m = 10, lambda = NULL) {
     diagX <- diag(ncol(x_reg))
     Txy <- t(x_reg) %*% y_reg
 
-    for (l in 1:length(lambda)){
+    for (l in 1:nlambda){
       beta[,l] <- solve(Txx + lambda[l] * diagX, Txy, tol = .Machine$double.eps)
     }
 
@@ -136,7 +127,7 @@ ridge_cv <- function(X, y, m = 10, lambda = NULL) {
 
   min_lambda = lambda[min_lambda_index]
 
-  returnList <- list(nridge = length(lambda),
+  returnList <- list(nlambda = nlambda,
                      lambda_grid = lambda,
                      min_lambda = min_lambda,
                      m_folds = m,
