@@ -1,9 +1,12 @@
 #' Wrapper function for the regmodelsuit package
 #'
 #' @param formula A formula object which specifies the model
-#' @param data A data frame which contains the corresponding variables
+#' @param data A data frame which contains the corresponding variables. If no
+#'   data frame is provided then the function will recursively search for
+#'   variables specified by the formula. The variables have to be defined in one
+#'   of the functions parent environments up to the global environment.
 #' @param model A string with the model to be estimated. Following models are
-#'    supported
+#'   supported
 #' \itemize{
 #'    \item "ridge"
 #'    \item "lasso"
@@ -12,21 +15,36 @@
 #'    \item "LAR"
 #' }
 #' @param lambda A numeric value which defines the penalty parameter for ridge
-#'    and lasso estimation. \cr
-#'    If using cross validation, it is a numeric vector with at least length 2.
-#'    If no lambda is given, cross validation will generate default values.
+#'   and lasso estimation. \cr If using cross validation, it is a numeric vector
+#'   with at least length 2. If no lambda is given, cross validation will
+#'   generate default values. The generated lambda grid is scaled by the total
+#'   number of lambdas (`nlambda`) to account for sample size.
 #' @param cv A logical value which specifies if cross validation should be used.
 #' @param m An integer for the amount of folds when using cross validation.
-#' @param nlambda An integer that defines the amount of values that are generated
-#'    as default lambdas in cross validation.
+#' @param nlambda An integer that defines the amount of values that are
+#'   generated as default lambdas in cross validation.
 #'
+#' @details If `lambda` is `NULL`, a grid of lambda values is automatically
+#' generated.
 #'
-#'    For more details regarding cross validation and the variables
-#'    see the cv vignette: \cr
-#'    \code{vignette("cv", package = "regmodelsuite")}
+#' The grid creation process is as follows:
+#'
+#' \itemize{
+#' \item A range of ratios is specified, from 0.002 to 50.
+#' \item The logarithms of these minimum and maximum values are computed to
+#' emphasize smaller lambda values.
+#' \item A sequence of evenly spaced values is generated on the logarithmic
+#' scale.
+#' \item The sequence is exponentiated to produce the actual lambda values.
+#' \item Finally, these lambda values are scaled by `nlambda`, the number of
+#' lambda values generated, to finalize the grid.
+#' }
+#'
+#' For more details regarding cross validation and the variables see the cv
+#' vignette: \cr \code{vignette("cv", package = "regmodelsuite")}
 #'
 #' @return S3 object of the chosen regression model class, containing different
-#'    informations.
+#'   informations.
 #' @export
 
 # TODO

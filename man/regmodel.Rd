@@ -18,7 +18,10 @@ regmodel(
 \arguments{
 \item{formula}{A formula object which specifies the model}
 
-\item{data}{A data frame which contains the corresponding variables}
+\item{data}{A data frame which contains the corresponding variables. If no
+data frame is provided then the function will recursively search for
+variables specified by the formula. The variables have to be defined in one
+of the functions parent environments up to the global environment.}
 
 \item{model}{A string with the model to be estimated. Following models are
 supported
@@ -31,20 +34,17 @@ supported
 }}
 
 \item{lambda}{A numeric value which defines the penalty parameter for ridge
-and lasso estimation. \cr
-If using cross validation, it is a numeric vector with at least length 2.
-If no lambda is given, cross validation will generate default values.}
+and lasso estimation. \cr If using cross validation, it is a numeric vector
+with at least length 2. If no lambda is given, cross validation will
+generate default values. The generated lambda grid is scaled by the total
+number of lambdas (\code{nlambda}) to account for sample size.}
 
 \item{cv}{A logical value which specifies if cross validation should be used.}
 
 \item{m}{An integer for the amount of folds when using cross validation.}
 
-\item{nlambda}{An integer that defines the amount of values that are generated
-as default lambdas in cross validation.
-
-For more details regarding cross validation and the variables
-see the cv vignette: \cr
-\code{vignette("cv", package = "regmodelsuite")}}
+\item{nlambda}{An integer that defines the amount of values that are
+generated as default lambdas in cross validation.}
 }
 \value{
 S3 object of the chosen regression model class, containing different
@@ -52,4 +52,24 @@ informations.
 }
 \description{
 Wrapper function for the regmodelsuit package
+}
+\details{
+If \code{lambda} is \code{NULL}, a grid of lambda values is automatically
+generated.
+
+The grid creation process is as follows:
+
+\itemize{
+\item A range of ratios is specified, from 0.002 to 50.
+\item The logarithms of these minimum and maximum values are computed to
+emphasize smaller lambda values.
+\item A sequence of evenly spaced values is generated on the logarithmic
+scale.
+\item The sequence is exponentiated to produce the actual lambda values.
+\item Finally, these lambda values are scaled by \code{nlambda}, the number of
+lambda values generated, to finalize the grid.
+}
+
+For more details regarding cross validation and the variables see the cv
+vignette: \cr \code{vignette("cv", package = "regmodelsuite")}
 }
