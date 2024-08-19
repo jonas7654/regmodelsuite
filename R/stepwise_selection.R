@@ -41,7 +41,7 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
       fit <- model_fct(formula = formula, data = X)
 
       # Predicting the data with the fitted model
-      prediction <- predict(fit, X)
+      prediction <- predict(fit)
 
       # Calculating squared error
       error <- sum((y - prediction) ^ 2) / length(prediction)
