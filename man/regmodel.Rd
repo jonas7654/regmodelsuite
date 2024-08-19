@@ -12,6 +12,7 @@ regmodel(
   cv = FALSE,
   m = 10,
   nlambda = 100,
+  n_predictors,
   ...
 )
 }

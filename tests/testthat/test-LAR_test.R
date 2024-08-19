@@ -31,14 +31,14 @@ test_that("LAR works", {
   expect_equal(LAR_fit$mean_x, colMeans(X))
   expect_equal(LAR_fit$sd_x, apply(X, 2 ,function(x) {sd(x)}))
 
-  # test coef
+    # test coef
   coef_test_LAR <- coef(LAR_fit)
 
   expect_equal(coef_test_LAR, LAR_fit$coefficients[n - 1, ])
 
   # Test predict
   # back to original scale
-  manual_predict <- mean(y) + scale(X) %*% coef_test_LAR
+  manual_predict <- as.vector(mean(y) + scale(X) %*% coef_test_LAR)
 
   expect_equal(manual_predict, predict(LAR_fit))
 
