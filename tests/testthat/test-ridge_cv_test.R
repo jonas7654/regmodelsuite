@@ -62,7 +62,3 @@ test_that("Lambda input checks work" , {
 
 
 })
-
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
-})

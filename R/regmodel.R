@@ -57,7 +57,7 @@
 # explain lambda grid
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
-                     cv = FALSE, m = 10, nlambda = 100, ...) {
+                     cv = FALSE, m = 10, nlambda = 100, n_predictors, ...) {
 
   # Input checks
   stopifnot("Please provide a valid formula object" =
@@ -104,6 +104,11 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   }
   else if (cv) {
     stop("Please choose ridge or lasso if choosing cv")
+  }
+  else if (model %in% c("forward", "backward")) {
+    stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
+    stopifnot("n_predictors must be numeric" = is.numeric(n_predictors))
+    stopifnot("n_predictors must be a single number" = length(n_predictors) == 1)
   }
 
   if (!is.null(data)) {
@@ -220,10 +225,10 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     }
   }
   else if(model == "forward") {
-    results <- forward_selection(X, y, ...)
+    results <- forward_selection(X, y, n_predictors = n_predictors, ...)
   }
   else if(model == "backward") {
-    results <- backward_selection(X, y, ...)
+    results <- backward_selection(X, y, n_predictors = n_predictors, ...)
   }
 
   # Add function call to results
