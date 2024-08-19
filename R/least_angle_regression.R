@@ -104,7 +104,7 @@ least_angle_regression <- function(X, y, verbose = F) {
                       mean_y = attr(y_demeaned, "scaled:center"),
                       mean_x = attr(X_scaled, "scaled:center"),
                       sd_x = attr(X_scaled, "scaled:scale"),
-                      model = X,
+                      model = X_scaled,
                       n = n,
                       p = p)
 
