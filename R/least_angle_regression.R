@@ -12,7 +12,7 @@
 
 
 least_angle_regression <- function(X, y, verbose = F) {
-
+  browser()
   n <- nrow(X)
   p <- ncol(X)
   max_iter <- min(n - 1, p)
@@ -61,7 +61,7 @@ least_angle_regression <- function(X, y, verbose = F) {
     else {
       alpha_neg <- (C_max - C_j[!active_variables]) / ((1 / sqrt_w) - B[!active_variables, ])
       alpha_pos <- (C_max + C_j[!active_variables]) / ((1 / sqrt_w) + B[!active_variables, ])
-      alpha <- min(c(alpha_neg, alpha_pos), na.rm = TRUE)
+      alpha <- min(c(alpha_neg[alpha_neg >= 0], alpha_pos[alpha_pos >= 0]), na.rm = TRUE)
     }
 
 
