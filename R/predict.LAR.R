@@ -24,12 +24,13 @@ predict.LAR <- function(object , newdata = NULL) {
     X <- as.matrix(newdata_scaled)
   } else {
     # Use the original model data for prediction
-    X <- object$model
+    X <- object$model # model is scaled
   }
 
 
   # Return predictions
   y_hat <- mean_y + X %*% beta
+  y_hat <- as.vector(y_hat)
 
   return(y_hat)
 }
