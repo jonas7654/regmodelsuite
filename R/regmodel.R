@@ -46,7 +46,7 @@
 #' @return S3 object of the chosen regression model class, containing different
 #'   informations.
 #'
-#' @importFrom base as.formula model.frame model.matrix.lm model.response
+#' @importFrom stats as.formula model.frame model.matrix.lm model.response
 #'   complete.cases
 #'
 #' @export
