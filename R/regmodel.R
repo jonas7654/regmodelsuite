@@ -189,6 +189,8 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     else {
       fit <- lasso(X, y, lambda)
       names(fit$coefficients) <- var_names_x
+      fit$active_variables <- names(fit$coefficients[fit$coefficients != 0])
+      fit$inactive_variables <- names(fit$coefficients[fit$coefficients == 0])
       results <- fit
     }
   }
