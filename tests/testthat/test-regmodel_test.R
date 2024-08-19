@@ -25,9 +25,9 @@ test_that("regmodel input checks work", {
   expect_error(regmodel(formula = formula, data = data, model = "ridge", lambda = -1))
   # Test for ridge regression with negative lambda grid
   expect_error(regmodel(formula = formula, data = data, model = "ridge", lambda = c(-1,-2,-5,2)))
-  # Test for ridge regression with a negative lambda
+  # Test for lasso regression with a negative lambda
   expect_error(regmodel(formula = formula, data = data, model = "lasso", lambda = -1))
-  # Test for ridge regression with negative lambda grid
+  # Test for lasso regression with negative lambda grid
   expect_error(regmodel(formula = formula, data = data, model = "lasso", lambda = c(-1,-2,-5,2)))
 
   # Test for wrong lambda
@@ -44,9 +44,11 @@ test_that("regmodel input checks work", {
   # Find variables in environment
 
   ###
-  # Das hier funktioniert nicht, da die x1 nicht gefunden wird in dieser testumgebung
+  # Das hier funktioniert nicht, da x1 nicht gefunden wird in dieser testumgebung
 
   # expect_no_error(regmodel(formula = y ~ x1 , model = "lasso", lambda = 1))
+
+
   ###
   expect_error(regmodel(formula = y ~ . , model = "lasso", lambda = 1))
 
