@@ -3,8 +3,9 @@ ridge_plots <- function(X,y,m){
   ridge_plot(X,y,m)
 }
 
-ridge_plot <- function(X,y,m){
-  cv_line <- X %*% ridge(X,y,ridge_cv(X,y,m)$cv.lambda)
+ridge_plot <- function(ridgeobj){
+  cv_line <- predict(ridgeobj)
+  X <- scale(ridgeobj$model, center = ridgeobj$mean_x, scale = ridgeobj$sd_x)
   plot(X[,1], y, main="Ridge-Schätzer", xlab="x1", ylab="y", pch=19, col="blue")
   lines(sort(X[,1]), cv_line, col="red", lwd=2)
 }
