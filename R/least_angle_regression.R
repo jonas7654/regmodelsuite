@@ -12,7 +12,7 @@
 
 
 least_angle_regression <- function(X, y, verbose = F) {
-  browser()
+
   n <- nrow(X)
   p <- ncol(X)
   max_iter <- min(n - 1, p)
