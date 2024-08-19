@@ -98,7 +98,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
       # if user chooses cv but default lambdas
       stopifnot("nlambda must be numeric" = is.numeric(nlambda))
       stopifnot("nlambda must be positive" = nlambda > 1)
-      stopifnot("nlambda must be a single number" = length(lambda) == 1)
+      stopifnot("nlambda must be a single number" = length(nlambda) == 1)
       nlambda <- as.integer(nlambda)
     }
   }
