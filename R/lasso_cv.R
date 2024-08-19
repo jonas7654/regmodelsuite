@@ -1,3 +1,7 @@
+#' @importFrom utils txtProgressBar
+#' @importFrom utils setTxtProgressBar
+#' @importFrom stats lm.fit
+
 # This is just a helper function for a more efficient calculation
 lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 

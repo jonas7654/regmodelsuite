@@ -1,3 +1,11 @@
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 theme_minimal
+#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 element_blank
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 aes
+#'
 #' @export
 
 plot.LAR <- function(lar_obj) {

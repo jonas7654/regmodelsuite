@@ -1,3 +1,9 @@
+#' @importFrom ggplot2 theme_minimal
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 geom_smooth
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 ggplot
+#'
 #' @export
 
 plot.ridge <- function(ridgeobj) {
@@ -10,6 +16,6 @@ plot.ridge <- function(ridgeobj) {
   ggplot(plot_values, aes(x = x1, y = y)) +
     geom_point(color = "blue", size = 3) +                # Werte als Punkte
     geom_smooth(aes(y = fitted), color = "red", size = 1, span = 0.1, method = 'loess', formula = 'y ~ x', se = FALSE) + # Ridge-Schätzer Linie
-    labs(title = "Ridge-Schätzer", x = "x1", y = "y") +   # Achsenbeschriftung und Titel
+    labs(title = "Ridge-Schaetzer", x = "x1", y = "y") +   # Achsenbeschriftung und Titel
     theme_minimal()
 }
