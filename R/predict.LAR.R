@@ -4,7 +4,7 @@
 predict.LAR <- function(object , newdata = NULL) {
   stopifnot("please provide a LAR object"  = inherits(object , "LAR"))
 
-  beta <- object$coefficients
+  beta <- object$coefficients[object$coefficients , ]
   mean_y <- object$mean_y
   means_X <- object$mean_x  # Mean of training data used for standardization
   sds_X <- object$sd_x      # Standard deviation of training data used for standardization
