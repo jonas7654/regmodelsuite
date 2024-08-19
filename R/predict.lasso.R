@@ -3,7 +3,7 @@
 
 predict.lasso <- function(object , newdata = NULL) {
   stopifnot("please provide a lasso object"  = inherits(object , "lasso"))
-
+  browser()
 
 
   beta <- object$coefficients

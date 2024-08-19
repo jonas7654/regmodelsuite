@@ -76,7 +76,9 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
                     R2 = r2,
                     y_mean = attr(y_demeaned, "scaled:center"),
                     x_mean = attr(X_scaled, "scaled:center"),
-                    x_sd = attr(X_scaled, "scaled:scale"))
+                    x_sd = attr(X_scaled, "scaled:scale"),
+                    model = X_scaled
+                    )
 
   class(lasso_obj) <- "lasso"
 
