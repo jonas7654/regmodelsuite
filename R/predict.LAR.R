@@ -1,7 +1,7 @@
 #' @export
 
 
-predict.LAR <- function(object , newobject = NULL) {
+predict.LAR <- function(object , newdata = NULL) {
   stopifnot("please provide a LAR object"  = inherits(object , "LAR"))
 
   beta <- object$coefficients

@@ -69,8 +69,8 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
 
   lasso_obj <- list(coefficients = beta,
-                    active_variables = coef_active,
-                    inactive_variables = coef_inactive,
+                    active_variables = NA,
+                    inactive_variables = NA,
                     iterations = m,
                     lambda = lambda,
                     R2 = r2,

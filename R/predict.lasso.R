@@ -1,7 +1,7 @@
 #' @export
 
 
-predict.lasso <- function(object , newobject = NULL) {
+predict.lasso <- function(object , newdata = NULL) {
   stopifnot("please provide a lasso object"  = inherits(object , "lasso"))
 
 
