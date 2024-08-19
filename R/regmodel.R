@@ -25,9 +25,9 @@
 #'   generated as default lambdas in cross validation.
 #'
 #' @details If `lambda` is `NULL`, a grid of lambda values is automatically
-#' generated.
+#'   generated.
 #'
-#' The grid creation process is as follows:
+#'   The grid creation process is as follows:
 #'
 #' \itemize{
 #' \item A range of ratios is specified, from 0.002 to 50.
@@ -40,11 +40,15 @@
 #' lambda values generated, to finalize the grid.
 #' }
 #'
-#' For more details regarding cross validation and the variables see the cv
-#' vignette: \cr \code{vignette("cv", package = "regmodelsuite")}
+#'   For more details regarding cross validation and the variables see the cv
+#'   vignette: \cr \code{vignette("cv", package = "regmodelsuite")}
 #'
 #' @return S3 object of the chosen regression model class, containing different
 #'   informations.
+#'
+#' @importFrom base as.formula model.frame model.matrix.lm model.response
+#'   complete.cases
+#'
 #' @export
 
 # TODO
