@@ -11,7 +11,7 @@
 coef.LAR <- function(object) {
     stopifnot("object must be of type LAR" = inherits(object, "LAR"))
 
-    betas <- object$coefficient
+    betas <- object$coefficient[nrow(object$coefficients) , ]
 
     return(betas)
 }
