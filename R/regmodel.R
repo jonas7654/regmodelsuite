@@ -156,7 +156,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
         results <- cv_results
       }
       else {
-        cv_results <- ridge_cv(X, y, m = 10)
+        cv_results <- ridge_cv(X, y, m = 10, nlambda = nlambda)
         results <- cv_results
       }
     }
@@ -182,7 +182,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
         results <- cv_results
       }
       else {
-        cv_results <- lasso_cv(X, y, m = 10)
+        cv_results <- lasso_cv(X, y, m = 10, nlambda = nlambda)
         results <- cv_results
       }
     }
