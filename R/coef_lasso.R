@@ -1,8 +1,8 @@
-#' S3 plot function for lasso
+#' Extract coefficients from an estimated lasso model
 #'
 #' @param lasso A lasso S3 Object
 #'
-#' @return plot
+#' @return lasso coefficients from regobject
 #'
 #' @export
 
