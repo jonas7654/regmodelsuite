@@ -3,7 +3,7 @@
 
 predict.lasso <- function(object , newdata = NULL) {
   stopifnot("please provide a lasso object"  = inherits(object , "lasso"))
-  browser()
+
   beta <- object$coefficients
   mean_y <- object$mean_y
   means_X <- object$mean_x  # Mean of training data used for standardization
@@ -31,6 +31,6 @@ predict.lasso <- function(object , newdata = NULL) {
 
   # Return predictions
   y_hat <- mean_y + X %*% beta
-
+  y_hat <- as.vector(y_hat)
   return(y_hat)
 }
