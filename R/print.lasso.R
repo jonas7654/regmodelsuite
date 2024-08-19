@@ -1,3 +1,7 @@
+#' print function for the lasso object
+
+#' @export
+
 print.lasso <- function(x, ...) {
   cat("Lasso Regression Results\n")
   cat("========================\n\n")

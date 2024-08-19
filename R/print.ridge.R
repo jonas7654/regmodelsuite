@@ -1,3 +1,4 @@
+#' @export
 
 print.ridge <- function(ridgeobj) {
   if (!inherits(ridgeobj, "ridge")) {

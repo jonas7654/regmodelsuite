@@ -1,3 +1,5 @@
+#' @export
+
 plot.ridge <- function(ridgeobj) {
   if (!inherits(ridgeobj, "ridge")) {
     stop("The provided object is not of class 'ridge'")
