@@ -3,14 +3,11 @@
 
 predict.lasso <- function(object , newdata = NULL) {
   stopifnot("please provide a lasso object"  = inherits(object , "lasso"))
-  browser()
-
 
   beta <- object$coefficients
-  mean_y <- object$mean_y
-  means_X <- object$mean_x  # Mean of training data used for standardization
-  sds_X <- object$sd_x      # Standard deviation of training data used for standardization
-  n <- object$n
+  mean_y <- object$y_mean
+  means_X <- object$x_mean  # Mean of training data used for standardization
+  sds_X <- object$x_sd   # Standard deviation of training data used for standardization
 
 
   # Check if newdata is provided

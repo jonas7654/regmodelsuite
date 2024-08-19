@@ -66,6 +66,7 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
   # Output section
   y_hat <- attr(y_demeaned, "scaled:center") + X_scaled %*% beta
   r2 <- calculate_R2(y , y_hat)
+  dim(r2) <- c(length(r2), 1)
 
 
   lasso_obj <- list(coefficients = beta,
@@ -74,10 +75,11 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
                     iterations = m,
                     lambda = lambda,
                     R2 = r2,
-                    y_mean = attr(y_demeaned, "scaled:center"),
-                    x_mean = attr(X_scaled, "scaled:center"),
-                    x_sd = attr(X_scaled, "scaled:scale"),
-                    model = X_scaled
+                    mean_y = attr(y_demeaned, "scaled:center"),
+                    mean_x = attr(X_scaled, "scaled:center"),
+                    sd_x = attr(X_scaled, "scaled:scale"),
+                    model = X_scaled,
+                    n = n
                     )
 
   class(lasso_obj) <- "lasso"
