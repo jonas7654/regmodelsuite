@@ -88,11 +88,18 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
         stopifnot("lambda values may not be negative" = all(lambda >= 0))
         stopifnot("Provide either a vector with length >= 2 or no lambda for cross validation.
     See ?ridge_cv or ?lasso_cv for details" =
-                    length(lambda) != 1)
+                    length(lambda) > 1)
 
         stopifnot("m has to be numeric" = is.numeric(m))
         m <- as.integer(m)
         stopifnot("m has to be 2 or larger" = m > 1)
+    }
+    else {
+      # if user chooses cv but default lambdas
+      stopifnot("nlambda must be numeric" = is.numeric(nlambda))
+      stopifnot("nlambda must be positive" = nlambda > 1)
+      stopifnot("nlambda must be a single number" = length(lambda) == 1)
+      nlambda <- as.integer(nlambda)
     }
   }
   else if (cv) {

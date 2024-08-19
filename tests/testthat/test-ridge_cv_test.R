@@ -53,6 +53,14 @@ test_that("Lambda input checks work" , {
   # default lambda
   default_lambda_100 <- log_lambda(100)
   default_lambda_10 <- log_lambda(10)
+
+  expect_no_error(results_100 <- regmodel(formula, data = data, model = "ridge", cv = T))
+  expect_equal(default_lambda_100, results_100$lambda)
+
+  expect_no_error(results_10 <- regmodel(formula, data = data, model = "ridge", cv = T, nlambda = 10))
+  expect_equal(default_lambda_10, results_10$lambda)
+
+
 })
 
 test_that("multiplication works", {
