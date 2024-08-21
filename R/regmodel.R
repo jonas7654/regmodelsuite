@@ -274,10 +274,10 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     }
   }
   else if(model == "forward") {
-    results <- forward_selection(X, y, n_predictors = n_predictors, ...)
+    results <- forward_selection(X, y, n_predictors = n_predictors)
   }
   else if(model == "backward") {
-    results <- backward_selection(X, y, n_predictors = n_predictors, ...)
+    results <- backward_selection(X, y, n_predictors = n_predictors)
   }
 
   # Add function call to results
