@@ -11,11 +11,11 @@ forward_selection(X, y, n_predictors, model_fct = lm, verbose = TRUE)
 
 \item{y}{Dataset y}
 
+\item{n_predictors}{Amount of predictors to select}
+
 \item{model_fct}{Modeling function with formula and data parameter (like lm)}
 
 \item{verbose}{Whether to print information of the selection process}
-
-\item{n_predicors}{Amount of predictors to select}
 }
 \value{
 A stepwise_selection object

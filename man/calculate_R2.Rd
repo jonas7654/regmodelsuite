@@ -17,8 +17,3 @@ R-Squared statistic
 \description{
 Calculate model R-Squared
 }
-\examples{
-y <- c(3, 5, 2, 8, 7)
-yhat <- c(2.8, 5.1, 2.4, 7.8, 7.2)
-calculate_R2(y, yhat)
-}

@@ -3,6 +3,7 @@ ridge_plots <- function(X,y,m){
   ridge_plot(X,y,m)
 }
 
+
 get_polynomial2 <- function(from, to, by, coeff, mean_t, sd_t, cols, target_col) {
 
   # browser()

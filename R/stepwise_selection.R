@@ -2,7 +2,7 @@
 #'
 #' @param X Dataset X
 #' @param y Dataset y
-#' @param n_predicors Amount of predictors to select
+#' @param n_predictors Amount of predictors to select
 #' @param model_fct Modeling function with formula and data parameter (like lm)
 #' @param verbose Whether to print information of the selection process
 #'
@@ -12,7 +12,6 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
 
   stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
 
-  unused_predictors <- colnames(X)
   used_predictors <- c()
   errors <- c()
   iterations <- min(n_predictors, ncol(X))
@@ -21,6 +20,8 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
   X <- data.frame(cbind(X, y))
 
   formula_start <- paste(colnames(X)[ncol(X)], "~")
+
+  unused_predictors <- colnames(X)[-ncol(X)]
 
   for(i in 1:iterations) {
 
@@ -98,15 +99,14 @@ backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRU
   stopifnot("More data points than predictors required."
             = nrow(X) > ncol(X))
 
-  used_predictors <- colnames(X)
-
-  errors <- c()
-  iterations <- length(used_predictors) - n_predictors + 1
-
   # Combining X and y and converting to data frame
   X <- data.frame(cbind(X, y))
 
   formula_start <- paste(colnames(X)[ncol(X)], "~")
+
+  used_predictors <- colnames(X)[-ncol(X)]
+  errors <- c()
+  iterations <- length(used_predictors) - n_predictors + 1
 
   for(i in 1:iterations) {
 

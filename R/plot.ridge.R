@@ -43,15 +43,16 @@ get_polynomial <- function(X, target, coeff, mean, sd, cols, means, sds) {
       # y <- y + coeff_t[i] * x
     }
   }
-
+  f(x) = b1 * x1 + b2*x2 + ....
 
   # need to add mean twice, because y and beta * x values are both demeaned.
   # y_t <- y * attr(y, "scaled:scale") +
-   #  attr(y, "scaled:center")# + ridgeobj$mean_y
+  #  attr(y, "scaled:center")# + ridgeobj$mean_y
 
   return(list(x = x, y = y))
 }
 
+#' @export
 plot.ridge <- function(ridgeobj, predictor) {
 
   if (!inherits(ridgeobj, "ridge")) {
@@ -85,11 +86,11 @@ plot.ridge <- function(ridgeobj, predictor) {
   # those values, as we mainly only need all values of y and x in the plot
   suppressWarnings(print(
     ggplot(df_data, aes(x = X, y = y)) +
-    geom_point(color = "darkslategray3", size = 1) +
-    labs(title = "Ridge-Schaetzer", x = colnames(ridgeobj$model)[t], y = "y") +
-    geom_line(data = df_regression, aes(x = x, y = y), color = "deeppink2") +
-    ylim(min(y) - 0.15 * (max(y)-min(y)), max(y) + 0.15 * (max(y)-min(y))) +
-    theme_minimal()
+      geom_point(color = "darkslategray3", size = 1) +
+      labs(title = "Ridge-Schaetzer", x = colnames(ridgeobj$model)[t], y = "y") +
+      geom_line(data = df_regression, aes(x = x, y = y), color = "deeppink2") +
+      ylim(min(y) - 0.15 * (max(y)-min(y)), max(y) + 0.15 * (max(y)-min(y))) +
+      theme_minimal()
   ))
 }
 

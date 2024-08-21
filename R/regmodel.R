@@ -23,28 +23,71 @@
 #' @param m An integer for the amount of folds when using cross validation.
 #' @param nlambda An integer that defines the amount of values that are
 #'   generated as default lambdas in cross validation.
+#' @param npredictors Blub.
 #'
-#' @details If `lambda` is `NULL`, a grid of lambda values is automatically
-#'   generated.
 #'
-#'   The grid creation process is as follows:
 #'
+#' @details
+#'
+#' **Ridge Regression** minimizes the following objective function:
+#' \deqn{L(\beta) = (Y - Xb)' (Y - Xb) + \lambda \beta'\beta} where
+#' \eqn{\lambda} is the penalty parameter that controls the amount of shrinkage
+#' applied to the coefficients \eqn{\beta}.
+#'
+#' When no lambda grid is specified for cross validation, the grid creation
+#' process for `lambda` is as follows:
 #' \itemize{
-#' \item A range of ratios is specified, from 0.002 to 50.
-#' \item The logarithms of these minimum and maximum values are computed to
-#' emphasize smaller lambda values.
-#' \item A sequence of evenly spaced values is generated on the logarithmic
-#' scale.
-#' \item The sequence is exponentiated to produce the actual lambda values.
-#' \item Finally, these lambda values are scaled by `nlambda`, the number of
-#' lambda values generated, to finalize the grid.
+#'   \item A range of ratios is specified, from 0.002 to 50.
+#'   \item The logarithms of these minimum and maximum values are computed to emphasize smaller lambda values.
+#'   \item A sequence of evenly spaced values is generated on the logarithmic scale.
+#'   \item The sequence is exponentiated to produce the actual lambda values.
+#'   \item Finally, these lambda values are scaled by `nlambda`, the number of lambda values generated, to finalize the grid.
 #' }
 #'
-#'   For more details regarding cross validation and the variables see the cv
-#'   vignette: \cr \code{vignette("cv", package = "regmodelsuite")}
+#' **Lasso Regression** minimizes the following objective function:
+#'  \deqn{L(\beta) = (Y - Xb)' (Y - Xb) + \lambda \sum(|\beta|)} where lambda
+#' is the penalty parameter.
 #'
-#' @return S3 object of the chosen regression model class, containing different
-#'   informations.
+#' **Least Angle Regression**
+#'
+#' \itemize{
+#'   \item At each step, LAR moves the coefficient of the most correlated predictor with the response variable towards its least-squares value.
+#'   \item The process continues until all predictors are included in the model or the desired number of predictors is reached. But at most \eqn{min(n - 1, p)} times
+#'   \item For a more detailed description of the algorithm see Hastie, Tibshirani, and Friedman (2009)
+#' }
+#'
+#' For more details on the methodology, see Hastie, Tibshirani, and Friedman
+#' (2009). As well as Richter, Stefan. "Statistisches und maschinelles Lernen."
+#' Berlin/Heidelberg (2019).
+#'
+#' @references Hastie, T., Tibshirani, R., & Friedman, J. (2009). \emph{The
+#'   Elements of Statistical Learning: Data Mining, Inference, and Prediction}
+#'   (2nd ed.). Springer. Richter, Stefan. "Statistisches und maschinelles Lernen."
+#'   Berlin/Heidelberg (2019).
+#'
+#' @return
+#' The function returns an S3 object, the structure of which depends on the model chosen:
+#' \itemize{
+#'   \item For "ridge" and "lasso", the object contains:
+#'     \itemize{
+#'       \item \code{coefficients} - The estimated coefficients.
+#'       \item \code{lambda} - The penalty parameter used.
+#'       \item \code{R2} - Calculated R-Squared
+#'       \item \code{mean_y} - Mean of the response variable
+#'       \item \code{mean_x} - Means of the Covariates
+#'       \item \code{sd_x} - Standard Deviations of the Covariates
+#'       \item \code{model} - Model Matrix containing the standardized Covariates
+#'       \item \code{y} - unscaled response variable
+#'       \item \code{n} - sample size
+#'       \item \code{p} - number of Covariates
+#'     }
+#'    \item For **Lasso** there are these additional outputs
+#'     \itemize{
+#'      \item \code{Iterations} - number of iterations
+#'      \item \code{active_variables} - Variables that were not set to zero
+#'      \item \code{inactive_variables} - Variables that were set to zero
+#'     }
+#'    }
 #'
 #' @importFrom stats as.formula model.frame model.matrix.lm model.response
 #'   complete.cases
@@ -61,7 +104,7 @@
 # explain lambda grid
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
-                     cv = FALSE, m = 10, nlambda = 100, n_predictors, ...) {
+                     cv = FALSE, m = 10, nlambda = 100, n_predictors) {
 
   # Input checks
   stopifnot("Please provide a valid formula object" =
@@ -127,8 +170,8 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   var_names <- all.vars(formula)
   if (is.null(data)) {
     data <- sapply(var_names, function(names) {
-                                   recursive_data_search(names, parent.frame())
-      })
+      recursive_data_search(names, parent.frame())
+    })
 
     data <- as.data.frame(as.matrix(data))
 
@@ -181,6 +224,8 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   # extract column names
   var_names_x <- dimnames(X)[[2]]
   colnames(X) <- var_names_x
+
+  var_names_y <- names(y)
 
   # Ridge call
   if (model == "ridge") {
