@@ -182,6 +182,8 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   var_names_x <- dimnames(X)[[2]]
   colnames(X) <- var_names_x
 
+  var_names_y <- names(y)
+
   # Ridge call
   if (model == "ridge") {
     if (cv) {

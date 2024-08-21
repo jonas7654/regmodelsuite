@@ -37,6 +37,7 @@ predict.ridge <- function(object, newdata = NULL) {
 
   # Return predictions
   y_hat <- mean_y + X %*% beta
+  names(y_hat) <- names(object$y)
 
   return(y_hat)
 }

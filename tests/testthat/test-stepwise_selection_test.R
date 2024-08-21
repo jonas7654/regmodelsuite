@@ -39,6 +39,7 @@ test_that("forward selection output is correct", {
 })
 
 test_that("backward selection output is correct", {
+
   result <- regmodel(formula = formula, data = data, model = "backward",
                      n_predictors = 1, verbose = F)
 
@@ -77,5 +78,24 @@ test_that("predict function is working", {
 
   expect_equal(forward_pred, lm_pred)
   expect_equal(backward_pred, lm_pred)
+
+
+  # Test with other models
+  browser()
+  formula <- mpg ~ factor(cyl, levels = c(8,6,4))
+  data <- mtcars
+  stepwise_ridge <- regmodel(formula,
+                             data = data,
+                             model = "forward",
+                             n_predictors = 2,
+                             model_fct=\(formula, data) regmodel(formula, data, "ridge",
+                                                                 lambda=0))
+
+  expect_false(anyNA(stepwise_ridge, recursive = T))
+
+  forward_ridge_pred <- predict(stepwise_ridge)
+  expect_equal(forward_pred, forward_ridge_pred)
+
+
 
 })

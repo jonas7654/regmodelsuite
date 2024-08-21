@@ -19,6 +19,7 @@ ridge <- function(X,y, lambda = 0){
                 mean_x = attr(X_scaled, "scaled:center"), # for rescaling when predicting
                 sd_x = attr(X_scaled, "scaled:scale"), # for rescaling when predicting
                 model = X_scaled,
+                y = y,
                 n = nrow(X),
                 p = ncol(X))
 

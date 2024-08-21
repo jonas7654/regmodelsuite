@@ -32,5 +32,8 @@ predict.lasso <- function(object , newdata = NULL) {
   # Return predictions
   y_hat <- mean_y + X %*% beta
   y_hat <- as.vector(y_hat)
+  names(y_hat) <- names(object$y)
+
+
   return(y_hat)
 }
