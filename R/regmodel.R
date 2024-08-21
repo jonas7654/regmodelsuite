@@ -24,6 +24,8 @@
 #' @param nlambda An integer that defines the amount of values that are
 #'   generated as default lambdas in cross validation.
 #'
+#'
+#'
 #' @details
 #'
 #' **Ridge Regression** minimizes the following objective function:
@@ -62,12 +64,29 @@
 #'   (2nd ed.). Springer. Richter, Stefan. "Statistisches und maschinelles Lernen."
 #'   Berlin/Heidelberg (2019).
 #'
-#' @return An S3 object of the chosen regression model class, containing various
-#'   information.
-#'
-#'
-#' @return S3 object of the chosen regression model class, containing different
-#'   informations.
+#' @return
+#' The function returns an S3 object, the structure of which depends on the model chosen:
+#' \itemize{
+#'   \item For "ridge" and "lasso", the object contains:
+#'     \itemize{
+#'       \item \code{coefficients} - The estimated coefficients.
+#'       \item \code{lambda} - The penalty parameter used.
+#'       \item \code{R2} - Calculated R-Squared
+#'       \item \code{mean_y} - Mean of the response variable
+#'       \item \code{mean_x} - Means of the Covariates
+#'       \item \code{sd_x} - Standard Deviations of the Covariates
+#'       \item \code{model} - Model Matrix containing the standardized Covariates
+#'       \item \code{y} - unscaled response variable
+#'       \item \code{n} - sample size
+#'       \item \code{p} - number of Covariates
+#'     }
+#'    \item For **Lasso** there are these additional outputs
+#'     \itemize{
+#'      \item \code{Iterations} - number of iterations
+#'      \item \code{active_variables} - Variables that were not set to zero
+#'      \item \code{inactive_variables} - Variables that were set to zero
+#'     }
+#'    }
 #'
 #' @importFrom stats as.formula model.frame model.matrix.lm model.response
 #'   complete.cases
