@@ -23,7 +23,14 @@
 #' @param m An integer for the amount of folds when using cross validation.
 #' @param nlambda An integer that defines the amount of values that are
 #'   generated as default lambdas in cross validation.
-#' @param npredictors Blub.
+#' @param n_predictors An integer which defines the amount of predictors to
+#'   select for forward or backward selection.
+#' @param model_fct A function which specifies the model used for forward or
+#'   backward selection. Needs to have the parameters \code{formula} and
+#'   \code{data} and needs to return and object with a \code{predict} function
+#'   implemented.
+#' @param verbose A logical which specifies if forward and and backward
+#'   selection print their selection process.
 #'
 #'
 #'
@@ -56,6 +63,19 @@
 #'   \item For a more detailed description of the algorithm see Hastie, Tibshirani, and Friedman (2009)
 #' }
 #'
+#' **Forward Selection** finds a subset of predictors, with a specified size,
+#' for a regression model. This method starts with an empty model and adds
+#' predictors one by one. At each step, the predictor that results in
+#' the lowest error is added to the model. This process continues until the
+#' specified number of predictors is selected.
+#'
+#' **Backward Selection** finds a subset of predictors, with a specified
+#' size, for a regression model. This method starts with all predictors and
+#' removes them one by one. At each step, the predictor with the
+#' lowest contribution to the model (lowest Z-score) is removed.
+#' This process continues until the specified number of predictors is reached.
+#'
+#'
 #' For more details on the methodology, see Hastie, Tibshirani, and Friedman
 #' (2009). As well as Richter, Stefan. "Statistisches und maschinelles Lernen."
 #' Berlin/Heidelberg (2019).
@@ -87,7 +107,16 @@
 #'      \item \code{active_variables} - Variables that were not set to zero
 #'      \item \code{inactive_variables} - Variables that were set to zero
 #'     }
-#'    }
+#'    \item For "forward" and "backward", the object contains:
+#'      \itemize{
+#'        \item \code{predictors} - The selected predictors.
+#'        \item \code{error} - The average error of the final model.
+#'        \item \code{direction} - The direction used.
+#'        \item \code{errors} - The errors of all the tested models.
+#'        \item \code{start_predictors} - The first amount of predictors tested.
+#'      }
+#' }
+#'
 #'
 #' @importFrom stats as.formula model.frame model.matrix.lm model.response
 #'   complete.cases
@@ -104,7 +133,8 @@
 # explain lambda grid
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
-                     cv = FALSE, m = 10, nlambda = 100, n_predictors) {
+                     cv = FALSE, m = 10, nlambda = 100, n_predictors = NULL,
+                     model_fct = lm, verbose = FALSE) {
 
   # Input checks
   stopifnot("Please provide a valid formula object" =
@@ -153,9 +183,12 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     stop("Please choose ridge or lasso if choosing cv")
   }
   else if (model %in% c("forward", "backward")) {
-    stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
     stopifnot("n_predictors must be numeric" = is.numeric(n_predictors))
+    stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
     stopifnot("n_predictors must be a single number" = length(n_predictors) == 1)
+
+    stopifnot("More data points than predictors required of backward selection."
+              = model != "backward" || nrow(X) > ncol(X))
   }
 
   if (!is.null(data)) {
@@ -274,10 +307,12 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     }
   }
   else if(model == "forward") {
-    results <- forward_selection(X, y, n_predictors = n_predictors)
+    results <- forward_selection(X, y, n_predictors = n_predictors,
+                                 model_fct = model_fct, verbose = verbose)
   }
   else if(model == "backward") {
-    results <- backward_selection(X, y, n_predictors = n_predictors)
+    results <- backward_selection(X, y, n_predictors = n_predictors,
+                                  model_fct = model_fct, verbose = verbose)
   }
 
   # Add function call to results
