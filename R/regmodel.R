@@ -127,8 +127,8 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   var_names <- all.vars(formula)
   if (is.null(data)) {
     data <- sapply(var_names, function(names) {
-                                   recursive_data_search(names, parent.frame())
-      })
+      recursive_data_search(names, parent.frame())
+    })
 
     data <- as.data.frame(as.matrix(data))
 

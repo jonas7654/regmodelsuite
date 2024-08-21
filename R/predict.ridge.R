@@ -37,7 +37,12 @@ predict.ridge <- function(object, newdata = NULL) {
 
   # Return predictions
   y_hat <- mean_y + X %*% beta
+  y_hat <- as.vector(y_hat)
   names(y_hat) <- names(object$y)
+
+  if (names(y_hat) != names(beta)) {
+    warning("column names did not match")
+  }
 
   return(y_hat)
 }

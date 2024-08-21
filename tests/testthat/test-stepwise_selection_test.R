@@ -81,7 +81,7 @@ test_that("predict function is working", {
 
 
   # Test with other models
-  browser()
+
   formula <- mpg ~ factor(cyl, levels = c(8,6,4))
   data <- mtcars
   stepwise_ridge <- regmodel(formula,
@@ -89,13 +89,43 @@ test_that("predict function is working", {
                              model = "forward",
                              n_predictors = 2,
                              model_fct=\(formula, data) regmodel(formula, data, "ridge",
-                                                                 lambda=0))
+                                                                 lambda= 0))
 
   expect_false(anyNA(stepwise_ridge, recursive = T))
 
   forward_ridge_pred <- predict(stepwise_ridge)
   expect_equal(forward_pred, forward_ridge_pred)
 
+  # new data
+  browser()
+
+  # Split the data
+  insample <- sample(1:nrow(mtcars), size = floor(0.5 * nrow(mtcars)), replace = FALSE)
+
+  ins <- mtcars[insample, ]
+  ins <- as.data.frame(ins)
+
+  out <- mtcars[-insample, , drop = FALSE]
+
+
+  formula <- mpg ~ factor(cyl, levels = c(8,6,4)) + 0
+
+  out_dummies <- model.matrix(formula, out)
+
+  out_dummies_df <- as.data.frame(out_dummies)
+
+  ridge_model <- regmodel(formula,
+                          data = ins,
+                          model = "forward",
+                          n_predictors = 2,
+                          model_fct=\(formula, data = ins) regmodel(formula, ins, "ridge",
+                                                              lambda= 0))
+
+  forward_ridge_pred_new <- predict(ridge_model, out)
+
+  manual_prediction1 <- as.matrix(out) %*% coef(stepwise_ridge)
+
+  expect_equal(forward_ridge_pred_new, manual_prediction1)
 
 
 })
