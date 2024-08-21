@@ -5,9 +5,10 @@ ridge_plots <- function(X,y,m){
 
 ridge_plot <- function(ridgeobj){
   cv_line <- predict(ridgeobj)
-  X <- scale(ridgeobj$model, center = ridgeobj$mean_x, scale = ridgeobj$sd_x)
-  plot(X[,1], y, main="Ridge-Schätzer", xlab="x1", ylab="y", pch=19, col="blue")
-  lines(sort(X[,1]), cv_line, col="red", lwd=2)
+  X <- scale(ridgeobj$model, center = -ridgeobj$mean_x, scale = ridgeobj$sd_x)
+  plot(X[,6], y, main="Ridge-Schätzer", xlab="x1", ylab="y", pch=19, col="blue")
+  lines(sort(X[,6]), cv_line, col="red", lwd=2)
+  abline(a = ridgeobj$mean_y, b = ridgeobj$coefficients[2])
 }
 
 ridge_plot_profile_lines <- function(X,y,m){
