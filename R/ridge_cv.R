@@ -3,9 +3,9 @@ ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
 
   stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))
 
-  if (nrow(X) %% m != 0) {
-    warning("nrow(X) is not divisible by m. Will divide X into m nearly equally sized folds.")
-  }
+  #if (nrow(X) %% m != 0) {
+  #  warning("nrow(X) is not divisible by m. Will divide X into m nearly equally sized folds.")
+  #}
 
   stopifnot("X and y must have the same amount of rows" = nrow(X) == nrow(y))
 
