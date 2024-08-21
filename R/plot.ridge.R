@@ -17,13 +17,13 @@ get_polynomial <- function(X, target, coeff, mean, sd, cols, means, sds) {
   y <- rep(0, length(x))
 
   for (i in 1:length(cols_t)) {
-    if (grepl(paste0("I\\(", cols[target], "\\^[1-9]+\\)"), cols_t[i])) {
+    if (grepl(paste0("I\\([\\+\\-]?", cols[target], "\\^[1-9]+\\)"), cols_t[i])) {
       # exponent expression, extract exponent
       exponent <- as.numeric(regmatches(cols_t[i],
-                                        regexpr(paste0("(?<=I\\(", cols[target], "\\^)[1-9]+"),
+                                        regexpr(paste0("(?<=I\\([\\+\\-]?", cols[target], "\\^)[1-9]+"),
                                                 cols_t[i],
                                                 perl = TRUE)))
-      y <- y + (coeff_t[i]/sds[cols_i[i]]) * (x^exponent)
+      y <- y + (coeff_t[i]/sds[cols_i[i]]) * (x**exponent-means[cols_i[i]])
     }
     else if (cols[target] == cols_t[i]) {
       y <- y + coeff_t[i] * ((x-means[cols_i[i]])/sds[cols_i[i]])
