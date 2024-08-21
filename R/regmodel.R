@@ -24,24 +24,47 @@
 #' @param nlambda An integer that defines the amount of values that are
 #'   generated as default lambdas in cross validation.
 #'
-#' @details If `lambda` is `NULL`, a grid of lambda values is automatically
-#'   generated.
+#' @details
 #'
-#'   The grid creation process is as follows:
+#' **Ridge Regression** minimizes the following objective function:
+#' \deqn{L(\beta) = (Y - Xb)' (Y - Xb) + \lambda \beta'\beta} where
+#' \eqn{\lambda} is the penalty parameter that controls the amount of shrinkage
+#' applied to the coefficients \eqn{\beta}.
 #'
+#' When no lambda grid is specified for cross validation, the grid creation
+#' process for `lambda` is as follows:
 #' \itemize{
-#' \item A range of ratios is specified, from 0.002 to 50.
-#' \item The logarithms of these minimum and maximum values are computed to
-#' emphasize smaller lambda values.
-#' \item A sequence of evenly spaced values is generated on the logarithmic
-#' scale.
-#' \item The sequence is exponentiated to produce the actual lambda values.
-#' \item Finally, these lambda values are scaled by `nlambda`, the number of
-#' lambda values generated, to finalize the grid.
+#'   \item A range of ratios is specified, from 0.002 to 50.
+#'   \item The logarithms of these minimum and maximum values are computed to emphasize smaller lambda values.
+#'   \item A sequence of evenly spaced values is generated on the logarithmic scale.
+#'   \item The sequence is exponentiated to produce the actual lambda values.
+#'   \item Finally, these lambda values are scaled by `nlambda`, the number of lambda values generated, to finalize the grid.
 #' }
 #'
-#'   For more details regarding cross validation and the variables see the cv
-#'   vignette: \cr \code{vignette("cv", package = "regmodelsuite")}
+#' **Lasso Regression** minimizes the following objective function:
+#'  \deqn{L(\beta) = (Y - Xb)' (Y - Xb) + \lambda \sum(|\beta|)} where lambda
+#' is the penalty parameter.
+#'
+#' **Least Angle Regression**
+#'
+#' \itemize{
+#'   \item At each step, LAR moves the coefficient of the most correlated predictor with the response variable towards its least-squares value.
+#'   \item The process continues until all predictors are included in the model or the desired number of predictors is reached. But at most \eqn{min(n - 1, p)} times
+#'   \item For a more detailed description of the algorithm see Hastie, Tibshirani, and Friedman (2009)
+#' }
+#'
+#' For more details on the methodology, see Hastie, Tibshirani, and Friedman
+#' (2009). As well as Richter, Stefan. "Statistisches und maschinelles Lernen."
+#' Berlin/Heidelberg (2019).
+#'
+#' @references Hastie, T., Tibshirani, R., & Friedman, J. (2009). \emph{The
+#'   Elements of Statistical Learning: Data Mining, Inference, and Prediction}
+#'   (2nd ed.). Springer. Richter, Stefan. "Statistisches und maschinelles Lernen."
+#'   Berlin/Heidelberg (2019).
+#'
+#' @return An S3 object of the chosen regression model class, containing various
+#'   information.
+#'
 #'
 #' @return S3 object of the chosen regression model class, containing different
 #'   informations.
