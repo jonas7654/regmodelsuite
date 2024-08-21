@@ -34,6 +34,9 @@ predict.lasso <- function(object , newdata = NULL) {
   y_hat <- as.vector(y_hat)
   names(y_hat) <- names(object$y)
 
+  if (names(y_hat) != names(beta)) {
+    warning("column names did not match")
+  }
 
   return(y_hat)
 }
