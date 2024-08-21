@@ -46,3 +46,36 @@ test_that("backward selection output is correct", {
   expect_true(result$predictors == "X5")
   expect_true(result$direction == "backward")
 })
+
+test_that("predict function is working", {
+  regmodel_fit_forward <- regmodel(mpg ~ factor(cyl, levels = c(8,6,4)),
+                                   data = mtcars,
+                                   model = "forward",
+                                   n_predictors = 2)
+
+  regmodel_fit_backward <- regmodel(mpg ~ factor(cyl, levels = c(8,6,4)),
+                                   data = mtcars,
+                                   model = "backward",
+                                   n_predictors = 2)
+
+  lm_fit <- lm(mpg ~ factor(cyl, levels = c(6,4,8)),
+               data = mtcars)
+
+  expect_false(anyNA(regmodel_fit_forward, recursive = T))
+  expect_false(anyNA(regmodel_fit_backward, recursive = T))
+  expect_false(anyNA(lm_fit, recursive = T))
+
+  # Get coefficients
+  coef_forward <- coef(regmodel_fit_forward)
+  coef_backward <- coef(regmodel_fit_backward)
+  coef_lm <- coef(lm_fit)
+
+  # predictions
+  forward_pred <- predict(regmodel_fit_forward)
+  backward_pred <- predict(regmodel_fit_backward)
+  lm_pred <- predict(lm_fit)
+
+  expect_equal(forward_pred, lm_pred)
+  expect_equal(backward_pred, lm_pred)
+
+})
