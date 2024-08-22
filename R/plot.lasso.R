@@ -4,8 +4,6 @@
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 ylim
-#'
-#' @export
 
 # Helper function
 get_polynomial <- function(X, target, coeff, mean, sd, cols, means, sds) {
@@ -32,6 +30,20 @@ get_polynomial <- function(X, target, coeff, mean, sd, cols, means, sds) {
   return(list(x = x, y = y))
 }
 
+#' Plot the Lasso Regression Function over a predictor
+#'
+#' Pass in a lasso object and select a predictor. The plot contains the original
+#' points of the model and draws the estimation of y based solely on the selected
+#' predictors. \cr
+#' plot.ridge can plot real polynomials, so a model that was fitted for the formula
+#' \code{y ~ x1 + x1^2 + 0.2*x1^5 + x2} could be plotted along x1.
+#'
+#' See \code{vignette("plot", package = "regmodel")} for detailed worked examples.
+#'
+#' @param lassoobj A lasso object
+#' @param predictor The index or name of the predictor, which will be on the
+#'    x-axis
+#'
 #' @export
 plot.lasso <- function(lassoobj, predictor) {
   if (!inherits(lassoobj, "lasso")) {
@@ -39,7 +51,7 @@ plot.lasso <- function(lassoobj, predictor) {
   }
 
   if (is.character(predictor)) {
-    predictor <- which(colnames(ridgeobj$model) == predictor)
+    predictor <- which(colnames(lassoobj$model) == predictor)
     if (length(predictor) == 0) {
       stop("Could not find predictor")
     }

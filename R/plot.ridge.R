@@ -31,7 +31,15 @@ get_polynomial <- function(X, target, coeff, mean, sd, cols, means, sds) {
   return(list(x = x, y = y))
 }
 
-#' Plot the Regression Function over a predictor
+#' Plot the Ridge Regression Function over a predictor
+#'
+#' Pass in a ridge object and select a predictor. The plot contains the original
+#' points of the model and draw the estimation of y based solely on the selected
+#' predictors. \cr
+#' plot.ridge can plot real polynomials, so a model that was fitted for the formula
+#' \code{y ~ x1 + x1^2 + 0.2*x1^5 + x2} could be plotted along x1.
+#'
+#' See \code{vignette("plot", package = "regmodel")} for detailed worked examples.
 #'
 #' @param ridgeobj A ridge object
 #' @param predictor The index or name of the predictor, which will be on the
