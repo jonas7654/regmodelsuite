@@ -134,7 +134,7 @@
 
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
                      cv = FALSE, m = 10, nlambda = 100, n_predictors = NULL,
-                     model_fct = lm, verbose = FALSE) {
+                     model_fct = lm, verbose = TRUE) {
 
   # Input checks
   stopifnot("Please provide a valid formula object" =
