@@ -15,11 +15,9 @@ This vignette demonstrates how to estimate a LASSO regression model using the `r
 
 To use the `regmodelsuite` package, you need to install it first:
 
-\`\`\`r \# If it's available on CRAN install.packages("regmodelsuite")
+ Or install the development version from GitHub
 
-# Or install the development version from GitHub
-
-# install.packages("devtools")
+ install.packages("devtools")
 
 devtools::install_github("jonas7654/regmodelsuite")
 
@@ -27,15 +25,13 @@ devtools::install_github("jonas7654/regmodelsuite")
 ```{r}
 library(regmodelsuite)
 
-# For demonstration, we'll use a dataset from the mlbench package
 df <- mtcars
 head(df)
 
 # Split the data into a Training Set and Test Set (60/40)
 indexes <- sample(1:nrow(df) * 0.6)
 training_set <- df[indexes , ]
-test_set <- df[-indexes, -1] # remove the response variable
-
+test_set <- df[-indexes, ] 
 
 ```
 In order to estimate a lasso model the user can supply a formula into the regmodel function. We are going to use the amount of cyclinders, horsepower, weight and transmission type for predicting miles per gallon. The variables "cyl" and "am" will be included as dummy variables.
@@ -44,8 +40,7 @@ First we are going to calculate value for lambda by using cross-validation
 ```{r}
 # seed for reproducebillity
 set.seed(2302)
-model_formula <- mpg ~ as.factor(cyl) + as.factor(am) + 
-                       hp + wt 
+model_formula <- mpg ~ as.factor(cyl) + as.factor(am) + .
 
 lasso_fit_cv <- regmodel(model_formula, data = training_set, model = "lasso", cv = T)
 
@@ -77,13 +72,11 @@ pred_insample <- predict(lasso_fit)
 print(pred_insample)
 
 # Now use the test set
-pred_outofsample <- predict.lasso(lasso_fit, newdata = test_set)
+pred_outofsample <- predict(lasso_fit, newdata = test_set[ , ])
 ```
 
 We can visualize the predictions using ggplot2
 ```{r}
 
-
-plot()
 ```
 

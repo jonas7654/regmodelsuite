@@ -315,5 +315,6 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   # Add function call to results
   results$call <- call
+  results$formula <- formula
   return(results)
 }
