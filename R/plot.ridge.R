@@ -31,7 +31,12 @@ get_polynomial <- function(X, target, coeff, mean, sd, cols, means, sds) {
   return(list(x = x, y = y))
 }
 
-
+#' Plot the Regression Function over a predictor
+#'
+#' @param ridgeobj A ridge object
+#' @param predictor The index or name of the predictor, which will be on the
+#'    x-axis
+#'
 #' @export
 plot.ridge <- function(ridgeobj, predictor) {
 
