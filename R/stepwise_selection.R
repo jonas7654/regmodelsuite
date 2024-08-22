@@ -2,16 +2,17 @@
 #'
 #' @param X Dataset X
 #' @param y Dataset y
-#' @param n_predictors Amount of predictors to select
-#' @param model_fct Modeling function with formula and data parameter (like lm)
-#' @param verbose Whether to print information of the selection process
+#' @param n_predictors An integer which defines the amount of predictors to
+#'   select.
+#' @param model_fct A function which specifies the modelused.
+#'   Needs to have the parameters \code{formula} and \code{data} and needs to
+#'   return and object with a \code{predict} function implemented.
+#' @param verbose A logical which specifies if the selection process should be
+#'   printed.
 #'
 #' @return A stepwise_selection object
 forward_selection <- function(X, y, n_predictors, model_fct = lm,
                                verbose = TRUE) {
-
-  stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
-
   used_predictors <- c()
   errors <- c()
   iterations <- min(n_predictors, ncol(X))
@@ -87,18 +88,16 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
 #'
 #' @param X Dataset X
 #' @param y Dataset y
-#' @param n_predicors Amount of predictors to select
-#' @param model_fct Modeling function with formula and data parameter (like lm)
-#' @param verbose Whether to print information of the selection process
+#' @param n_predictors An integer which defines the amount of predictors to
+#'   select.
+#' @param model_fct A function which specifies the modelused.
+#'   Needs to have the parameters \code{formula} and \code{data} and needs to
+#'   return and object with a \code{predict} function implemented.
+#' @param verbose A logical which specifies if the selection process should be
+#'   printed.
 #'
 #' @return A stepwise_selection object
 backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRUE) {
-
-  stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
-
-  stopifnot("More data points than predictors required."
-            = nrow(X) > ncol(X))
-
   # Combining X and y and converting to data frame
   X <- data.frame(cbind(X, y))
 

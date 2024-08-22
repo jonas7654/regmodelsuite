@@ -12,7 +12,9 @@ regmodel(
   cv = FALSE,
   m = 10,
   nlambda = 100,
-  n_predictors
+  n_predictors = NULL,
+  model_fct = lm,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -46,7 +48,16 @@ number of lambdas (\code{nlambda}) to account for sample size.}
 \item{nlambda}{An integer that defines the amount of values that are
 generated as default lambdas in cross validation.}
 
-\item{npredictors}{Blub.}
+\item{n_predictors}{An integer which defines the amount of predictors to
+select for forward or backward selection.}
+
+\item{model_fct}{A function which specifies the model used for forward or
+backward selection. Needs to have the parameters \code{formula} and
+\code{data} and needs to return and object with a \code{predict} function
+implemented.}
+
+\item{verbose}{A logical which specifies if forward and and backward
+selection print their selection process.}
 }
 \value{
 The function returns an S3 object, the structure of which depends on the model chosen:
@@ -69,6 +80,14 @@ The function returns an S3 object, the structure of which depends on the model c
 \item \code{Iterations} - number of iterations
 \item \code{active_variables} - Variables that were not set to zero
 \item \code{inactive_variables} - Variables that were set to zero
+}
+\item For "forward" and "backward", the object contains:
+\itemize{
+\item \code{predictors} - The selected predictors.
+\item \code{error} - The average error of the final model.
+\item \code{direction} - The direction used.
+\item \code{errors} - The errors of all the tested models.
+\item \code{start_predictors} - The first amount of predictors tested.
 }
 }
 }
@@ -102,6 +121,18 @@ is the penalty parameter.
 \item The process continues until all predictors are included in the model or the desired number of predictors is reached. But at most \eqn{min(n - 1, p)} times
 \item For a more detailed description of the algorithm see Hastie, Tibshirani, and Friedman (2009)
 }
+
+\strong{Forward Selection} finds a subset of predictors, with a specified size,
+for a regression model. This method starts with an empty model and adds
+predictors one by one. At each step, the predictor that results in
+the lowest error is added to the model. This process continues until the
+specified number of predictors is selected.
+
+\strong{Backward Selection} finds a subset of predictors, with a specified
+size, for a regression model. This method starts with all predictors and
+removes them one by one. At each step, the predictor with the
+lowest contribution to the model (lowest Z-score) is removed.
+This process continues until the specified number of predictors is reached.
 
 For more details on the methodology, see Hastie, Tibshirani, and Friedman
 (2009). As well as Richter, Stefan. "Statistisches und maschinelles Lernen."
