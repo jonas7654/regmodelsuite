@@ -55,6 +55,7 @@
 #'  \deqn{L(\beta) = (Y - Xb)' (Y - Xb) + \lambda \sum(|\beta|)} where lambda
 #' is the penalty parameter.
 #'
+#'
 #' **Least Angle Regression**
 #'
 #' \itemize{
@@ -197,7 +198,6 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
 
   ########################################################################
-  browser()
 
   # Extract data from parent environments up until the globalenv
   var_names <- all.vars(formula)
