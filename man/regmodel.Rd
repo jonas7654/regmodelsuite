@@ -14,7 +14,7 @@ regmodel(
   nlambda = 100,
   n_predictors = NULL,
   model_fct = lm,
-  verbose = FALSE
+  verbose = TRUE
 )
 }
 \arguments{
