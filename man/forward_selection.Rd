@@ -11,11 +11,15 @@ forward_selection(X, y, n_predictors, model_fct = lm, verbose = TRUE)
 
 \item{y}{Dataset y}
 
-\item{n_predictors}{Amount of predictors to select}
+\item{n_predictors}{An integer which defines the amount of predictors to
+select.}
 
-\item{model_fct}{Modeling function with formula and data parameter (like lm)}
+\item{model_fct}{A function which specifies the modelused.
+Needs to have the parameters \code{formula} and \code{data} and needs to
+return and object with a \code{predict} function implemented.}
 
-\item{verbose}{Whether to print information of the selection process}
+\item{verbose}{A logical which specifies if the selection process should be
+printed.}
 }
 \value{
 A stepwise_selection object

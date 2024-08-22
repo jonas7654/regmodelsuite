@@ -2,22 +2,26 @@
 #'
 #' @param X Dataset X
 #' @param y Dataset y
-#' @param n_predictors Amount of predictors to select
-#' @param model_fct Modeling function with formula and data parameter (like lm)
-#' @param verbose Whether to print information of the selection process
+#' @param n_predictors An integer which defines the amount of predictors to
+#'   select.
+#' @param model_fct A function which specifies the modelused.
+#'   Needs to have the parameters \code{formula} and \code{data} and needs to
+#'   return and object with a \code{predict} function implemented.
+#' @param verbose A logical which specifies if the selection process should be
+#'   printed.
 #'
 #' @return A stepwise_selection object
 forward_selection <- function(X, y, n_predictors, model_fct = lm,
                                verbose = TRUE) {
-
-  stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
-
   used_predictors <- c()
   errors <- c()
   iterations <- min(n_predictors, ncol(X))
 
   # Combining X and y and converting to data frame
-  X <- data.frame(cbind(X, y))
+  X <- data.frame(cbind(X, y), check.names = FALSE)
+
+  # Changing the name of the new y column if there already was one
+  colnames(X) <- c(colnames(X)[-ncol(X)], make.unique(colnames(X))[ncol(X)])
 
   formula_start <- paste(colnames(X)[ncol(X)], "~")
 
@@ -37,12 +41,13 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
 
       # Creating formula object with the new combination
       formula <- as.formula(paste(formula_start,
-                                  paste(cur_predictors, collapse="+")))
+                                  paste("`", cur_predictors, "`",
+                                        sep="", collapse="+")))
 
       fit <- model_fct(formula = formula, data = X)
 
       # Predicting the data with the fitted model
-      prediction <- predict(fit, X)
+      prediction <- predict(fit)
 
       # Calculating squared error
       error <- sum((y - prediction) ^ 2) / length(prediction)
@@ -87,18 +92,16 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
 #'
 #' @param X Dataset X
 #' @param y Dataset y
-#' @param n_predicors Amount of predictors to select
-#' @param model_fct Modeling function with formula and data parameter (like lm)
-#' @param verbose Whether to print information of the selection process
+#' @param n_predictors An integer which defines the amount of predictors to
+#'   select.
+#' @param model_fct A function which specifies the modelused.
+#'   Needs to have the parameters \code{formula} and \code{data} and needs to
+#'   return and object with a \code{predict} function implemented.
+#' @param verbose A logical which specifies if the selection process should be
+#'   printed.
 #'
 #' @return A stepwise_selection object
 backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRUE) {
-
-  stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
-
-  stopifnot("More data points than predictors required."
-            = nrow(X) > ncol(X))
-
   # Combining X and y and converting to data frame
   X <- data.frame(cbind(X, y))
 
@@ -121,7 +124,7 @@ backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRU
     # First error is irrelevant
     if(i != 1) {
       # Predicting the data with the fitted model
-      prediction <- predict(fit, X)
+      prediction <- predict(fit)
 
       # Calculating squared error
       error <- sum((y - prediction) ^ 2) / length(prediction)
@@ -171,28 +174,4 @@ backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRU
   class(results) <- "stepwise_selection"
 
   results
-}
-
-#' @export
-print.stepwise_selection <- function(object) {
-  cat("Stepwise selection object\n")
-  cat("-------------------------\n")
-  cat(sprintf("Selected predictors: %s\n",
-              paste(object$predictors, collapse=", ")))
-  cat(sprintf("Error: %f\n", object$error))
-  cat(sprintf("Direction: %s", object$direction))
-}
-
-#' @export
-plot.stepwise_selection <- function(object) {
-  plot_data <- data.frame(x = length(object$predictors):object$start_predictors,
-                          y = object$errors)
-
-  ggplot(plot_data, aes(x, y)) +
-    xlab("Predictor Subset Size") +
-    ylab("Error") +
-    geom_point(size = 3) +
-    geom_line() +
-    theme_minimal() +
-    ggtitle("Stepwise selection")
 }
