@@ -100,7 +100,7 @@ ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
   # Close progress bar
   close(pb)
 
-  browser()
+  #browser()
 
 
   MSPE_cv = colMeans(mspe_temp)

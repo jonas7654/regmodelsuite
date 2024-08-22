@@ -146,7 +146,7 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
 
     # This is a n x length(lambda) matrix
     out_of_sample_predicted_y <- as.matrix(apply(beta, 2, function(beta) {
-      y_mean + test_data_scaled %*% beta
+      y_mean + traindata_scaled %*% beta
     }))
 
     # Calculate prediction error
