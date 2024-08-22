@@ -40,6 +40,13 @@ plot.ridge <- function(ridgeobj, predictor) {
     ta <- 1
   }
 
+  if (is.character(predictor)) {
+    predictor <- which(colnames(ridgeobj$model) == predictor)
+    if (length(predictor) == 0) {
+      stop("Could not find predictor")
+    }
+  }
+
   t <- predictor
   X <- ridgeobj$model[,t] * ridgeobj$sd_x[t] + ridgeobj$mean_x[t]
   y <- ridgeobj$y

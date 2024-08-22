@@ -35,10 +35,15 @@ get_polynomial <- function(X, target, coeff, mean, sd, cols, means, sds) {
 #' @export
 plot.lasso <- function(lassoobj, predictor) {
   if (!inherits(lassoobj, "lasso")) {
-    #stop("The provided object is not of class 'lasso'")
-    ta <- 1
+    stop("The provided object is not of class 'lasso'")
   }
 
+  if (is.character(predictor)) {
+    predictor <- which(colnames(ridgeobj$model) == predictor)
+    if (length(predictor) == 0) {
+      stop("Could not find predictor")
+    }
+  }
   t <- predictor
   X <- lassoobj$model[,t] * lassoobj$sd_x[t] + lassoobj$mean_x[t]
   y <- lassoobj$y
