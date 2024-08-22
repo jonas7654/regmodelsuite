@@ -1,0 +1,42 @@
+---
+title: "Using the lasso estimator with regmodelsuite"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{lasso}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+This vignette demonstrates how to estimate a LASSO regression model using the `regmodelsuite` package. LASSO is a type of linear regression that includes a penalty to shrink some coefficients to zero, effectively performing variable selection.
+
+# Installation
+
+To use the `regmodelsuite` package, you need to install it first:
+
+\`\`\`r \# If it's available on CRAN install.packages("regmodelsuite")
+
+# Or install the development version from GitHub
+
+# install.packages("devtools")
+
+devtools::install_github("jonas7654/regmodelsuite")
+
+
+```{r}
+library(regmodelsuite)
+
+# For demonstration, we'll use a built-in dataset like mtcars
+data("mtcars")
+
+df <- mtcars
+head(df)
+
+```
+In order to estimate a lasso model the user can supply a formula into the regmodel function. We are going to use the amount of cyclinders, horsepower, weight and transmission type for predicting miles per gallon. The variables "cyl" and "am" will be included as dummy variables.
+
+```{r}
+lasso_fit <- regmodel(mpg ~ as.factor(cyl) + as.factor(am) + hp + wt, data = mtcars, model = "lasso", lambda = 0)
+```
+

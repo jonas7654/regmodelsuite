@@ -18,7 +18,10 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
   iterations <- min(n_predictors, ncol(X))
 
   # Combining X and y and converting to data frame
-  X <- data.frame(cbind(X, y))
+  X <- data.frame(cbind(X, y), check.names = FALSE)
+
+  # Changing the name of the new y column if there already was one
+  colnames(X) <- c(colnames(X)[-ncol(X)], make.unique(colnames(X))[ncol(X)])
 
   formula_start <- paste(colnames(X)[ncol(X)], "~")
 
@@ -38,12 +41,13 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
 
       # Creating formula object with the new combination
       formula <- as.formula(paste(formula_start,
-                                  paste(cur_predictors, collapse="+")))
+                                  paste("`", cur_predictors, "`",
+                                        sep="", collapse="+")))
 
       fit <- model_fct(formula = formula, data = X)
 
       # Predicting the data with the fitted model
-      prediction <- predict(fit, X)
+      prediction <- predict(fit)
 
       # Calculating squared error
       error <- sum((y - prediction) ^ 2) / length(prediction)
@@ -120,7 +124,7 @@ backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRU
     # First error is irrelevant
     if(i != 1) {
       # Predicting the data with the fitted model
-      prediction <- predict(fit, X)
+      prediction <- predict(fit)
 
       # Calculating squared error
       error <- sum((y - prediction) ^ 2) / length(prediction)
@@ -170,28 +174,4 @@ backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRU
   class(results) <- "stepwise_selection"
 
   results
-}
-
-#' @export
-print.stepwise_selection <- function(object) {
-  cat("Stepwise selection object\n")
-  cat("-------------------------\n")
-  cat(sprintf("Selected predictors: %s\n",
-              paste(object$predictors, collapse=", ")))
-  cat(sprintf("Error: %f\n", object$error))
-  cat(sprintf("Direction: %s", object$direction))
-}
-
-#' @export
-plot.stepwise_selection <- function(object) {
-  plot_data <- data.frame(x = length(object$predictors):object$start_predictors,
-                          y = object$errors)
-
-  ggplot(plot_data, aes(x, y)) +
-    xlab("Predictor Subset Size") +
-    ylab("Error") +
-    geom_point(size = 3) +
-    geom_line() +
-    theme_minimal() +
-    ggtitle("Stepwise selection")
 }

@@ -2,10 +2,19 @@
 % Please edit documentation in R/predict.stepwise_selection.R
 \name{predict.stepwise_selection}
 \alias{predict.stepwise_selection}
-\title{Predict function for stepwise_selection()}
+\title{Predicts data using a stepwise selection object.}
 \usage{
-\method{predict}{stepwise_selection}(selectionobject, newdata = NULL)
+\method{predict}{stepwise_selection}(object, newdata = NULL)
+}
+\arguments{
+\item{object}{Stepwise selection object}
+
+\item{newdata}{Data to predict, if left empty predicts the data the model
+was fitted on.}
+}
+\value{
+The predicted data.
 }
 \description{
-Predict function for stepwise_selection()
+Predicts data using a stepwise selection object.
 }

@@ -1,0 +1,126 @@
+---
+title: "Stepwise Selection"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Stepwise Selection}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(regmodelsuite)
+```
+
+## Data
+For the stepwise selection examples, we will use the built-in `mtcars` dataset:
+```{r}
+head(mtcars)
+```
+
+## Running Stepwise Selection
+To run a stepwise selection, you need to call the wrapper function 
+`regmodel()` with the `model` parameter set to `"forward"` for forward
+selection or `"backward"` for backward selection. You can then set the
+`formula` parameter to a formula object and the `data` parameter to a
+data frame. To specify the number of predictors to select, you need to set
+the `n_predictors` parameter. Here, we select 2 predictors using forward
+selection for a model predicting `mpg` from all the other columns:
+```{r}
+forward <- regmodel(formula = mpg ~ ., data = mtcars, model = "forward",
+                    n_predictors = 2)
+```
+To understand how the predictors were selected, you can check what the function
+printed. It first tried each predictor on its own, then selected `wt`
+because it had the lowest average error. It then tried each predictor again,
+combined with `wt`, and selected `cyl` because it had the lowest
+average error.  
+
+If you do not want the function to print this, you can set the `verbose`
+parameter to `FALSE`:
+```{r}
+forward <- regmodel(formula = mpg ~ ., data = mtcars, model = "forward",
+                    n_predictors = 5, verbose = FALSE)
+```
+
+You can run backward selection in the same way.
+Here, we select 8 predictors using backward selection for the same model:
+```{r}
+backward <- regmodel(formula = mpg ~ ., data = mtcars, model = "backward",
+                     n_predictors = 8)
+```
+Again, you can see how the predictors were selected by checking what the
+function printed. It first tried all predictors and then removed `cyl`
+because it had the lowest contribution to the model, measured by the Z-score.
+It then tried all predictors except `cyl` and removed `vs` because it had
+the lowest Z-score. All the other predictors were therefore selected.
+
+## Using the stepwise selection object
+After running a stepwise selection, you get an S3 object of the type
+`stepwise_selection`. To see the result of the selection, you can simply print
+the object:
+```{r}
+forward
+```
+You can see which predictors were selected, what the error of the final model
+has, and in which direction the selection was made.  
+To get the selected parameters as a character vector, you can use the
+`predictors` attribute:
+```{r}
+forward$predictors
+```
+
+If you want to predict the data with the model, you can either extract the model
+using the `model` attribute or use the `predict` function directly on the
+stepwise selection object:
+```{r}
+predict(forward)
+```
+
+If you want to predict new data, you can supply data of the same format using
+the `new_data` parameter. Here, we use an edited version of `mtcars`:
+```{r}
+new_data <- mtcars * 0.5
+predict(forward, new_data[forward$predictors])
+```
+
+## Using Different Models
+By default, stepwise selection uses the built-in `lm` regression model, but
+you can also use different models by supplying a function with the `model_fct`
+parameter. This function must have a `data` parameter that accepts a
+data frame and a `formula` parameter that accepts a formula object. The
+function must also return an object with an implemented `predict` function.
+For example, you can use the built-in `glm` function:
+```{r}
+regmodel(formula = mpg ~ ., data = mtcars, model = "forward",
+         n_predictors = 2, model_fct = glm, verbose = FALSE)
+```
+
+You can also use the models implemented in this package, but you need to put
+the function call inside another function. For example, this is how you can use
+ridge regression:
+```{r}
+regmodel(formula = mpg ~ ., data = mtcars, model = "forward",
+         n_predictors = 2, verbose = FALSE,
+         model_fct=\(formula, data) regmodel(formula, data, "ridge", lambda=0))
+```
+
+## Visualizing the Selection
+To visualize the selection process of a stepwise selection object as a graph,
+you can use the `plot` function. It shows the error at each step,
+with every number of predictors until the specified amount is reached:
+```{r}
+plot(forward)
+```
+
+You can also get the values of the errors as a vector if you want to visualize
+them yourself:
+```{r}
+forward$errors
+```

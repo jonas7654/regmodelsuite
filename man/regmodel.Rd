@@ -14,7 +14,7 @@ regmodel(
   nlambda = 100,
   n_predictors = NULL,
   model_fct = lm,
-  verbose = FALSE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -39,11 +39,11 @@ supported
 and lasso estimation. \cr If using cross validation, it is a numeric vector
 with at least length 2. If no lambda is given, cross validation will
 generate default values. The generated lambda grid is scaled by the total
-number of lambdas (\code{nlambda}) to account for sample size.}
+number of lambdas (\code{nlambda}) to account for sample size. (Only for ridge and Lasso)}
 
-\item{cv}{A logical value which specifies if cross validation should be used.}
+\item{cv}{A logical value which specifies if cross validation should be used. (Only for ridge and Lasso)}
 
-\item{m}{An integer for the amount of folds when using cross validation.}
+\item{m}{An integer for the amount of folds when using cross validation. (Only for ridge and Lasso)}
 
 \item{nlambda}{An integer that defines the amount of values that are
 generated as default lambdas in cross validation.}

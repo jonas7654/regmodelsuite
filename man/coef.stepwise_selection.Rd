@@ -2,10 +2,16 @@
 % Please edit documentation in R/coef.stepwise_selection.R
 \name{coef.stepwise_selection}
 \alias{coef.stepwise_selection}
-\title{Extract coefficients from selection_model}
+\title{Extracts the coefficients of a stepwise selection object.}
 \usage{
 \method{coef}{stepwise_selection}(object)
 }
+\arguments{
+\item{object}{Stepwise selection object}
+}
+\value{
+The coefficients.
+}
 \description{
-Extract coefficients from selection_model
+Extracts the coefficients of a stepwise selection object.
 }
