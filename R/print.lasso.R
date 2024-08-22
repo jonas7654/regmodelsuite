@@ -1,8 +1,8 @@
 #' print function for the lasso object
-
+#' @param x a S3 lasso object estimated by regmodel
 #' @export
 
-print.lasso <- function(x, ...) {
+print.lasso <- function(x) {
   cat("Lasso Regression Results\n")
   cat("========================\n\n")
 

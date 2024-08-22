@@ -60,7 +60,6 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
 lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
   # --- Errors and Warnings --- #
-
   stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))
 
   if (nrow(X) %% m != 0) {

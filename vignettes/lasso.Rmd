@@ -27,16 +27,63 @@ devtools::install_github("jonas7654/regmodelsuite")
 ```{r}
 library(regmodelsuite)
 
-# For demonstration, we'll use a built-in dataset like mtcars
-data("mtcars")
-
+# For demonstration, we'll use a dataset from the mlbench package
 df <- mtcars
 head(df)
 
+# Split the data into a Training Set and Test Set (60/40)
+indexes <- sample(1:nrow(df) * 0.6)
+training_set <- df[indexes , ]
+test_set <- df[-indexes, -1] # remove the response variable
+
+
 ```
 In order to estimate a lasso model the user can supply a formula into the regmodel function. We are going to use the amount of cyclinders, horsepower, weight and transmission type for predicting miles per gallon. The variables "cyl" and "am" will be included as dummy variables.
+First we are going to calculate value for lambda by using cross-validation
 
 ```{r}
-lasso_fit <- regmodel(mpg ~ as.factor(cyl) + as.factor(am) + hp + wt, data = mtcars, model = "lasso", lambda = 0)
+# seed for reproducebillity
+set.seed(2302)
+model_formula <- mpg ~ as.factor(cyl) + as.factor(am) + 
+                       hp + wt 
+
+lasso_fit_cv <- regmodel(model_formula, data = training_set, model = "lasso", cv = T)
+
+min_lambda <- lasso_fit_cv$min_lambda
+
+print(lasso_fit_cv)
+
+
+```
+The "lasso_fit" object contains information about the cross validation process. To use the estimated lambda for the final model we can use \code{regmodel} again
+
+```{r}
+lasso_fit <- regmodel(model_formula,
+                      data = training_set,
+                      model = "lasso",
+                      lambda = min_lambda)
+
+print(lasso_fit)
+```
+In this case three variables were selected by the lasso model
+
+Predictions can be done by using the \code{predict()} function.
+Just calling predict on a lasso object will use the training data set for 
+predictions. By specifying \code{newdata}, the estimated model will be applied to 
+the new data.
+
+```{r}
+pred_insample <- predict(lasso_fit)
+print(pred_insample)
+
+# Now use the test set
+pred_outofsample <- predict.lasso(lasso_fit, newdata = test_set)
+```
+
+We can visualize the predictions using ggplot2
+```{r}
+
+
+plot()
 ```
 

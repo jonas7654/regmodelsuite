@@ -201,6 +201,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   # Extract data from parent environments up until the globalenv
   var_names <- all.vars(formula)
+
   if (is.null(data)) {
     data <- sapply(var_names, function(names) {
       recursive_data_search(names, parent.frame())
@@ -216,6 +217,15 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     names(data) <- var_names
   }
 
+
+  test_numeric <- sapply(data, is.numeric, simplify = T)
+  if (!all(test_numeric)) {
+    non_numeric_vars <- names(data)[!test_numeric]
+    if (length(intersect(non_numeric_vars, var_names)) > 0) {
+      stop("non numeric variables are found. Consider using as.factor()
+           in the formula")
+    }
+  }
 
 
   # Create model frame
@@ -251,7 +261,6 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   }
 
   # Init
-  results <- list()
   call <- match.call()
 
   # extract column names
