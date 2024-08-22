@@ -4,7 +4,8 @@
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 ylim
-#' @importFrom ggplot2 xlim
+#'
+#' @export
 
 # Helper function
 get_polynomial <- function(X, target, coeff, mean, sd, cols, means, sds) {
@@ -31,39 +32,37 @@ get_polynomial <- function(X, target, coeff, mean, sd, cols, means, sds) {
   return(list(x = x, y = y))
 }
 
-
 #' @export
-plot.ridge <- function(ridgeobj, predictor) {
-
-  if (!inherits(ridgeobj, "ridge")) {
-    stop("The provided object is not of class 'ridge'")
+plot.lasso <- function(lassoobj, predictor) {
+  if (!inherits(lassoobj, "lasso")) {
+    #stop("The provided object is not of class 'lasso'")
     ta <- 1
   }
 
   t <- predictor
-  X <- ridgeobj$model[,t] * ridgeobj$sd_x[t] + ridgeobj$mean_x[t]
-  y <- ridgeobj$y
+  X <- lassoobj$model[,t] * lassoobj$sd_x[t] + lassoobj$mean_x[t]
+  y <- lassoobj$y
 
   df_data <- data.frame(x1 = X, y = y)
 
   poly <- get_polynomial(X,
                          target = t,
-                         coeff = ridgeobj$coefficients,
-                         mean = ridgeobj$mean_x[t],
-                         sd = ridgeobj$sd_x[t],
-                         cols = colnames(ridgeobj$model),
-                         means = ridgeobj$mean_x,
-                         sds = ridgeobj$sd_x)
+                         coeff = lassoobj$coefficients,
+                         mean = lassoobj$mean_x[t],
+                         sd = lassoobj$sd_x[t],
+                         cols = colnames(lassoobj$model),
+                         means = lassoobj$mean_x,
+                         sds = lassoobj$sd_x)
 
   df_regression <- data.frame(x = poly$x,
-                              y = poly$y + ridgeobj$mean_y)
+                              y = poly$y + lassoobj$mean_y)
 
   # Suppress warnings because ylim cuts off values but we do not care about
   # those values, as we mainly only need all values of y and x in the plot
   suppressWarnings(print(
     ggplot(df_data, aes(x = X, y = y)) +
       geom_point(color = "darkslategray3", size = 1) +
-      labs(title = "Ridge-Schaetzer", x = colnames(ridgeobj$model)[t], y = "y") +
+      labs(title = "Lasso-Schaetzer", x = colnames(lassoobj$model)[t], y = "y") +
       geom_line(data = df_regression, aes(x = x, y = y), color = "deeppink2") +
       ylim(min(y) - 0.15 * (max(y)-min(y)), max(y) + 0.15 * (max(y)-min(y))) +
       xlim(min(X) - 0.07 * (max(X)-min(X)), max(X) + 0.07 * (max(X)-min(X))) +
