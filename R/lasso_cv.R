@@ -46,7 +46,7 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
       }
 
-      max_abs_beta_diff <- max(abs(beta - beta_old))
+      max_abs_beta_diff <- max(abs(beta_old - beta_old))
       m <- m + 1
 
     }
@@ -59,6 +59,7 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
 
 lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
+
   # --- Errors and Warnings --- #
   stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))
 
@@ -141,7 +142,7 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
     y_mean = attr(y_reg, "scaled:center")
 
     # Scale the out of sample X by the mean and sd of the training data X
-    test_data_scaled <- (testData - x_mean) / x_sd
+    traindata_scaled <- scale(testData, center = x_mean, scale = x_sd) # (testData - x_mean) / x_sd
 
     # This is a n x length(lambda) matrix
     out_of_sample_predicted_y <- as.matrix(apply(beta, 2, function(beta) {

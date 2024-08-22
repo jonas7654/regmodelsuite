@@ -230,7 +230,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   ### Handle missing values ###
 
   # Find complete rows and drop NA rows
-  complete_rows <- complete.cases(X)
+  complete_rows <- complete.cases(mf)
   if (sum(complete_rows) == 0) {
     stop("The dataframe has only missing values")
   }
@@ -315,6 +315,6 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   # Add function call to results
   results$call <- call
-  results$formula <- formula
+  results$formula <- formula_without_intercept
   return(results)
 }

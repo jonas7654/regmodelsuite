@@ -11,25 +11,16 @@ vignette: >
 
 This vignette demonstrates how to estimate a LASSO regression model using the `regmodelsuite` package. LASSO is a type of linear regression that includes a penalty to shrink some coefficients to zero, effectively performing variable selection.
 
-# Installation
-
-To use the `regmodelsuite` package, you need to install it first:
-
- Or install the development version from GitHub
-
- install.packages("devtools")
-
-devtools::install_github("jonas7654/regmodelsuite")
 
 
 ```{r}
 library(regmodelsuite)
 
-df <- mtcars
+df <- airquality
 head(df)
 
 # Split the data into a Training Set and Test Set (60/40)
-indexes <- sample(1:nrow(df) * 0.6)
+indexes <- sample(1:nrow(df) * 0.5)
 training_set <- df[indexes , ]
 test_set <- df[-indexes, ] 
 
@@ -40,7 +31,7 @@ First we are going to calculate value for lambda by using cross-validation
 ```{r}
 # seed for reproducebillity
 set.seed(2302)
-model_formula <- mpg ~ as.factor(cyl) + as.factor(am) + .
+model_formula <- Ozone ~ .*. + .^3 + .^4 + .^5 + .^6
 
 lasso_fit_cv <- regmodel(model_formula, data = training_set, model = "lasso", cv = T)
 
@@ -72,7 +63,7 @@ pred_insample <- predict(lasso_fit)
 print(pred_insample)
 
 # Now use the test set
-pred_outofsample <- predict(lasso_fit, newdata = test_set[ , ])
+pred_outofsample <- predict(lasso_fit, newdata = test_set)
 ```
 
 We can visualize the predictions using ggplot2

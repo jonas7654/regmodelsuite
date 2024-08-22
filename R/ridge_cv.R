@@ -80,7 +80,7 @@ ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
     # Get mean of training data y
     y_mean = attr(y_reg, "scaled:center")
 
-    traindata_scaled <- (testData - x_mean) / x_sd
+    traindata_scaled <- scale(testData, center = x_mean, scale = x_sd) # (testData - x_mean) / x_sd
 
     # Rescale predicated values
     # This is a n x length(lambda) matrix
@@ -99,6 +99,9 @@ ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
   }
   # Close progress bar
   close(pb)
+
+  browser()
+
 
   MSPE_cv = colMeans(mspe_temp)
   min_lambda_index <- which.min(MSPE_cv)
