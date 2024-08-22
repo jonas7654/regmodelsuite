@@ -202,31 +202,20 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   # Extract data from parent environments up until the globalenv
   var_names <- all.vars(formula)
 
-  if (is.null(data)) {
-    data <- sapply(var_names, function(names) {
-      recursive_data_search(names, parent.frame())
-    })
+  # if (is.null(data)) {
+  #  data <- sapply(var_names, function(names) {
+  #    recursive_data_search(names, parent.frame())
+  #  })
 
-    data <- as.data.frame(as.matrix(data))
+  #  data <- as.data.frame(as.matrix(data))
 
-    # Check that all variables were collected
-    if (ncol(data) != length(var_names)) {
-      stop("Couldn't find all variables")
-    }
+  #  # Check that all variables were collected
+  #  if (ncol(data) != length(var_names)) {
+  #    stop("Couldn't find all variables")
+  #  }
 
-    names(data) <- var_names
-  }
-
-
-  test_numeric <- sapply(data, is.numeric, simplify = T)
-  if (!all(test_numeric)) {
-    non_numeric_vars <- names(data)[!test_numeric]
-    if (length(intersect(non_numeric_vars, var_names)) > 0) {
-      stop("non numeric variables are found. Consider using as.factor()
-           in the formula")
-    }
-  }
-
+  #  names(data) <- var_names
+  #}
 
   # Create model frame
   formula_without_intercept <- as.formula(paste(deparse(formula) , "+ 0"))
