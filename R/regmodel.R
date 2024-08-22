@@ -18,9 +18,9 @@
 #'   and lasso estimation. \cr If using cross validation, it is a numeric vector
 #'   with at least length 2. If no lambda is given, cross validation will
 #'   generate default values. The generated lambda grid is scaled by the total
-#'   number of lambdas (`nlambda`) to account for sample size.
-#' @param cv A logical value which specifies if cross validation should be used.
-#' @param m An integer for the amount of folds when using cross validation.
+#'   number of lambdas (`nlambda`) to account for sample size. (Only for ridge and Lasso)
+#' @param cv A logical value which specifies if cross validation should be used. (Only for ridge and Lasso)
+#' @param m An integer for the amount of folds when using cross validation. (Only for ridge and Lasso)
 #' @param nlambda An integer that defines the amount of values that are
 #'   generated as default lambdas in cross validation.
 #' @param npredictors Blub.
@@ -164,7 +164,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
 
   ########################################################################
-
+  browser()
 
   # Extract data from parent environments up until the globalenv
   var_names <- all.vars(formula)
