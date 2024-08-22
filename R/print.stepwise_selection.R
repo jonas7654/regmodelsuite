@@ -1,3 +1,7 @@
+#' Prints information of a stepwise selection object.
+#'
+#' @param object Stepwise selection object
+#'
 #' @export
 print.stepwise_selection <- function(object) {
   cat("Stepwise selection object\n")

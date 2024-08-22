@@ -1,3 +1,15 @@
+#' Plots the selection process of a stepwise selection object.
+#'
+#' @param object Stepwise selection object
+#' @return A ggplot.
+#'
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 xlab
+#' @importFrom ggplot2 ylab
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 theme_minimal
+#' @importFrom ggplot2 ggtitle
 #' @export
 plot.stepwise_selection <- function(object) {
   plot_data <- data.frame(x = length(object$predictors):object$start_predictors,

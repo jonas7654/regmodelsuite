@@ -1,5 +1,9 @@
-#' Extract coefficients from selection_model
-
+#' Extracts the coefficients of a stepwise selection object.
+#'
+#' @param object Stepwise selection object
+#' @return The coefficients.
+#'
+#' @export
 coef.stepwise_selection <- function(object) {
   stopifnot("object must be of type stepwise_selection" =
               inherits(object, "stepwise_selection"))
