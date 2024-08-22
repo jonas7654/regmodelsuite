@@ -14,15 +14,22 @@ This vignette demonstrates how to estimate a LASSO regression model using the `r
 
 
 ```{r}
+library(Ecdat)
+library(dplyr)
 library(regmodelsuite)
 
-df <- airquality
+df <- Caschool %>%
+  select(-district)
 head(df)
 
 # Split the data into a Training Set and Test Set (60/40)
-indexes <- sample(1:nrow(df) * 0.5)
+indexes <- sample(1:(nrow(df) * 0.5))
 training_set <- df[indexes , ]
 test_set <- df[-indexes, ] 
+
+dim(df)
+dim(training_set)
+dim(test_set)
 
 ```
 In order to estimate a lasso model the user can supply a formula into the regmodel function. We are going to use the amount of cyclinders, horsepower, weight and transmission type for predicting miles per gallon. The variables "cyl" and "am" will be included as dummy variables.
@@ -31,13 +38,13 @@ First we are going to calculate value for lambda by using cross-validation
 ```{r}
 # seed for reproducebillity
 set.seed(2302)
-model_formula <- Ozone ~ .*. + .^3 + .^4 + .^5 + .^6
+model_formula <- mathscr ~ .*.
 
-lasso_fit_cv <- regmodel(model_formula, data = training_set, model = "lasso", cv = T)
+ridgeCV <- regmodel(model_formula, data = training_set, model = "ridge", cv = T)
 
-min_lambda <- lasso_fit_cv$min_lambda
+min_lambda <- ridgeCV$min_lambda
 
-print(lasso_fit_cv)
+print(ridgeCV)
 
 
 ```

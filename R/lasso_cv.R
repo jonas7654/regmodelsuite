@@ -142,11 +142,11 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
     y_mean = attr(y_reg, "scaled:center")
 
     # Scale the out of sample X by the mean and sd of the training data X
-    traindata_scaled <- scale(testData, center = x_mean, scale = x_sd) # (testData - x_mean) / x_sd
+    testdata_scaled <- scale(testData, center = x_mean, scale = x_sd) # (testData - x_mean) / x_sd
 
     # This is a n x length(lambda) matrix
     out_of_sample_predicted_y <- as.matrix(apply(beta, 2, function(beta) {
-      y_mean + traindata_scaled %*% beta
+      y_mean + testdata_scaled %*% beta
     }))
 
     # Calculate prediction error
