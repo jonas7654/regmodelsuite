@@ -1,14 +1,8 @@
 ---
-title: "Ridge"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Ridge}
-=======
 title: "Ridge Regression with Custom Function"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Ridge Regression with Custom Function}
->>>>>>> 30cd6c235c07828bb55b9a06058fbf081a3e9612
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -22,7 +16,6 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-<<<<<<< HEAD
 This vignette demonstrates how to estimate a Ridge regression model using the `regmodelsuite` package. Ridge is a type of linear regression that includes a penalty to shrink some coefficients.
 
 First we are going to create some example Data where the number of predictors
