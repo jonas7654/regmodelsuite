@@ -177,7 +177,8 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-06) {
                      m_folds = m,
                      MSPE = MSPE_cv,
                      X = X,
-                     y = y)
+                     y = y,
+                     all_coefficients = beta)
 
   class(returnList) <- c("lasso_cv", "cv")
 

@@ -18,22 +18,24 @@ plot.cv <- function(cvobj) {
   }
 
   lambda_seq <- cvobj$lambda_grid
-  coeff_seq <- matrix(0, nrow = ncol(cvobj$X), ncol = length(lambda_seq))
 
-  for (i in seq_along(lambda_seq)) {
-    if (inherits(cvobj, "ridge_cv")) {
-      coeff_seq[, i] <- ridge(cvobj$X, cvobj$y, lambda_seq[i])$coefficients
-    }
-    else if (inherits(cvobj, "lasso_cv")) {
-      coeff_seq[, i] <- lasso(cvobj$X, cvobj$y, lambda_seq[i])$coefficients
-    }
+  coeff_seq <- coef(cvobj, unscale = TRUE)
+
+  if (inherits(cvobj,"ridge_cv")) {
+    name <- "Ridge-Schätzer: Profillinien der Parameter"
+  }
+  else if (inherits(cvobj,"lasso_cv")) {
+    name <- "LASSO-Schätzer: Profillinien der Parameter"
   }
 
   matplot(lambda_seq, t(coeff_seq),
           type = "l", lty = 1, col = 1:ncol(coeff_seq),
           xlab = "lambda", ylab = "geschätzte Parameter beta",
-          main = "Ridge-Schätzer: Profillinien der Parameter", log = "x", xaxt = "n"
+          main = name, log = "x", xaxt = "n"
   )
+
+  legend("topright", legend = 1:nrow(coeff_seq),col = 1:nrow(coeff_seq),
+         cex=0.8,fill=1:nrow(coeff_seq))
 
   axis(1, at = c(1e-3, 1e-1, 1e1, 1e3), labels = c("1e-3", "1e-1", "1e1", "1e3"))
 

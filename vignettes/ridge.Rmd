@@ -73,8 +73,6 @@ ridgeCV <- regmodel(model_formula, data = training_set, model = "ridge", cv = T)
 min_lambda <- ridgeCV$min_lambda
 
 print(ridgeCV)
-
-
 ```
 The "ridge_fit" object contains information about the cross validation process. To use the estimated lambda for the final model we can use \code{regmodel} again
 

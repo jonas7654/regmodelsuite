@@ -113,7 +113,8 @@ ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
                      m_folds = m,
                      MSPE = MSPE_cv,
                      X = X,
-                     y = y)
+                     y = y,
+                     all_coefficients = beta)
 
   class(returnList) <- c("ridge_cv", "cv")
 
