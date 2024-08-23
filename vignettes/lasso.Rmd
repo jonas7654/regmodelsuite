@@ -16,12 +16,13 @@ is greater than the number of observations p >> n
 
 ```{r}
 library(regmodelsuite)
+library(ggplot2)
 
 set.seed(123)  # For reproducibility
 
 # Parameters
-n <- 50  # Number of observations
-p <- 60  # Number of predictors
+n <- 400  # Number of observations
+p <- 300  # Number of predictors
 
 # Generate predictor matrix (X) with normal distributed values
 X <- matrix(rnorm(n * p), nrow = n, ncol = p)
@@ -52,9 +53,10 @@ dim(test_set)
 
 ```
 To estimate a lasso model the user has to supply a formula into the regmodel
-function.
+function. We are going to add all p predictors.
 
-
+Here we use the pre calculated lambda grid with 10 lambdas with 5 folds for
+cross validation.
 ```{r}
 # seed for reproducebillity
 set.seed(2302)
@@ -75,11 +77,13 @@ The "lasso_fit" object contains information about the cross validation process. 
 lasso_fit <- regmodel(model_formula,
                       data = training_set,
                       model = "lasso",
-                      lambda = 0.02)
+                      lambda = min_lambda)
 
 print(lasso_fit)
+
+
+
 ```
-In this case three variables were selected by the lasso model
 
 Predictions can be done by using the \code{predict()} function.
 Just calling predict on a lasso object will use the training data set for 
@@ -90,12 +94,18 @@ the new data.
 pred_insample <- predict(lasso_fit)
 print(pred_insample)
 
+cat("----------------------------------------------------------- \n \n")
+
 # Now use the test set
 pred_outofsample <- predict(lasso_fit, newdata = test_set)
+print(pred_outofsample)
+
+# Calculate the Mean squared prediction error
+mean((pred_outofsample - test_set$y)^2)
 ```
 
-We can visualize the predictions using ggplot2
+We can visualize the Mean squared prediction error
 ```{r}
-
+plot(log(lassoCV$lambda_grid), lassoCV$MSPE)
 ```
 

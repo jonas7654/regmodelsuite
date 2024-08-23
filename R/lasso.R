@@ -41,9 +41,9 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
   mean_X_scaled_squared <- colMeans(X_scaled^2)
 
-  m <- 1L
+  m <- 0L
 
-  max_iterations <- 1000
+  max_iterations <- 100
 
 
   while((max_abs_beta_diff > tol) && (m <= max_iterations)) {
@@ -81,7 +81,9 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
     m <- m + 1
 
   }
-
+  if (m == max_iterations) {
+    warning("max iterations were reached while computing coordinate descent")
+  }
   stopifnot("couldn't calculate coefficients. Data is probably poor conditioned"
             = !is.nan(beta))
 

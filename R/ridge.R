@@ -30,17 +30,3 @@ ridge <- function(X,y, lambda = 0){
 }
 
 
-
-
-
-#test wie in Richter (am ende entfernen, beispiel von @example):
-set.seed(21)
-n <- 100
-d <- 10
-o <- 0.3
-X <- matrix(runif(n * d), n, d) #unabhÃĪngig+gleichverteilt auf [0,1]
-real_ridge <- runif(d, min = -1, max = 1) #die echten Werte fÃžr Beta
-y <- X %*% real_ridge + rnorm(n, mean = 0, sd = o) #Y mit normalverteiltem Messfehler N(0,o^2)
-test_ridge <- ridge(X,y,0)
-as.vector(test_ridge)
-real_ridge
