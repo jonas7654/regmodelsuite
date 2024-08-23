@@ -11,37 +11,54 @@ vignette: >
 
 This vignette demonstrates how to estimate a LASSO regression model using the `regmodelsuite` package. LASSO is a type of linear regression that includes a penalty to shrink some coefficients to zero, effectively performing variable selection.
 
-We are going to use the Caschool dataset from the package \code{Ecdat}.
-Below we are splitting the dataset into a training set and test set.
+First we are going to create some example Data where the number of predictors
+is greater than the number of observations p >> n
 
 ```{r}
-library(Ecdat)
-library(dplyr)
 library(regmodelsuite)
 
-df <- Caschool %>%
-  select(-district)
-head(df)
+set.seed(123)  # For reproducibility
 
-# Split the data into a Training Set and Test Set (60/40)
-indexes <- sample(1:(nrow(df) * 0.5))
-training_set <- df[indexes , ]
-test_set <- df[-indexes, ] 
+# Parameters
+n <- 200  # Number of observations
+p <- 1000  # Number of predictors
+
+# Generate predictor matrix (X) with normal distributed values
+X <- matrix(rnorm(n * p), nrow = n, ncol = p)
+
+# Create a true coefficient vector
+beta_true <- rnorm(p)
+
+# zero out some coefficients
+beta_true[abs(beta_true) < 0.5] <- 0
+
+# Generate response variable (y) as a linear combination of predictors + noise
+y <- X %*% beta_true + rnorm(n)
+
+# Convert to data frame
+df <- data.frame(X)
+df$y <- y
+
+
+# Split the dataset into a training and test set (50/50)
+Indexes <- sample(1:(nrow(df) * 0.5))
+
+training_set <- df[Indexes , ]
+test_set <- df[-Indexes , ]
 
 dim(df)
 dim(training_set)
 dim(test_set)
 
 ```
-To estimate a lasso model the user has to supply a formula into the regmodel function.
-We are going to use the amount of cyclinders, horsepower, weight and transmission type for predicting miles per gallon. The variables "cyl" and "am" will be included as dummy variables.
-First we are going to calculate value for lambda by using cross-validation
+To estimate a lasso model the user has to supply a formula into the regmodel
+function.
+
 
 ```{r}
 # seed for reproducebillity
 set.seed(2302)
-model_formula <- mathscr ~ as.factor(county)
-
+model_formula <- y ~ .
 lassoCV <- regmodel(model_formula, data = training_set, model = "lasso", cv = T,
                     nlambda = 5)
 

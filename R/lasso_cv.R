@@ -110,7 +110,6 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
   for(i in 1:m){
 
 
-    browser()
     # Segment data
     Indexes <- which(folds==i, arr.ind=TRUE)
 

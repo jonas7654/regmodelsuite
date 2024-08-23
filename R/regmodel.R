@@ -53,7 +53,8 @@
 #'
 #' **Lasso Regression** minimizes the following objective function:
 #'  \deqn{L(\beta) = (Y - Xb)' (Y - Xb) + \lambda \sum(|\beta|)} where lambda
-#' is the penalty parameter.
+#' is the penalty parameter. Minimization will be done by a coordinate descent
+#' algorithm.
 #'
 #'
 #' **Least Angle Regression**
