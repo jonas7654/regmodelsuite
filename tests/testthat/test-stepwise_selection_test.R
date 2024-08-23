@@ -22,7 +22,7 @@ test_that("backward selection input checks work", {
   expect_error(regmodel(formula = formula, data = data, model = "backward",
                         n_predictors = 0, verbose = F))
 
-  expect_error(regmodel(formula = formula, data = data.frame(x1=1, x2=1, y=1),
+  expect_error(regmodel(formula = formula, data = data.frame(x1=1:2, x2=1:2, x3=5:4, y=1:2),
                         model = "backward", n_predictors = 1, verbose = F))
 
   expect_no_error(regmodel(formula = formula, data = data, model = "backward",
