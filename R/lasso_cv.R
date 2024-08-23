@@ -59,7 +59,6 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
 
 lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
-
   # --- Errors and Warnings --- #
   stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))
 
@@ -109,19 +108,21 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
 
   # Perform m-fold cross validation
   for(i in 1:m){
-    # Segment data
-    Indexes <- which(folds==i,arr.ind=TRUE)
 
-    testData <- X[Indexes, ]
-    trainData <- X[-Indexes, ]
+
+    # Segment data
+    Indexes <- which(folds==i, arr.ind=TRUE)
+
+    testData <- X[Indexes, , drop = FALSE]
+    trainData <- X[-Indexes, , drop = FALSE]
 
     ytestData <- y[Indexes]
     ytrainData <- y[-Indexes]
 
     #standardize
 
-    x_reg = scale(trainData) # standardize
-    y_reg = scale(ytrainData,scale = FALSE) # demean
+    x_reg <- scale(trainData) # standardize
+    y_reg <- scale(ytrainData,scale = FALSE) # demean
 
     # --- Perform LASSO Regression --- #
     # Funktionsfabrik
@@ -133,6 +134,9 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
       beta[ , l] <- lasso_estimator(lambda[l])
     }
 
+    stopifnot("couldn't calculate coefficients. Data is probably poor conditioned"
+              = !is.nan(beta))
+
     # calculate predicted values on original scale
     # Get mean and sd from the training data X
     x_mean <- attr(x_reg, "scaled:center")
@@ -142,11 +146,11 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
     y_mean = attr(y_reg, "scaled:center")
 
     # Scale the out of sample X by the mean and sd of the training data X
-    traindata_scaled <- scale(testData, center = x_mean, scale = x_sd) # (testData - x_mean) / x_sd
+    testdata_scaled <- scale(testData, center = x_mean, scale = x_sd) # (testData - x_mean) / x_sd
 
     # This is a n x length(lambda) matrix
     out_of_sample_predicted_y <- as.matrix(apply(beta, 2, function(beta) {
-      y_mean + traindata_scaled %*% beta
+      y_mean + testdata_scaled %*% beta
     }))
 
     # Calculate prediction error

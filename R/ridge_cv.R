@@ -3,7 +3,7 @@ ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
 
   stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))
 
-  #if (nrow(X) %% m != 0) {
+    #if (nrow(X) %% m != 0) {
   #  warning("nrow(X) is not divisible by m. Will divide X into m nearly equally sized folds.")
   #}
 
@@ -51,8 +51,8 @@ ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
     # Segment data
     Indexes <- which(folds==i,arr.ind=TRUE)
 
-    testData <- X[Indexes,]
-    trainData <- X[-Indexes,]
+    testData <- X[Indexes, , drop = FALSE]
+    trainData <- X[-Indexes, , drop = FALSE]
 
     ytestData <- y[Indexes]
     ytrainData <- y[-Indexes]
@@ -71,6 +71,8 @@ ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
     for (l in 1:nlambda){
       beta[,l] <- solve(Txx + lambda[l] * diagX, Txy, tol = .Machine$double.eps)
     }
+    stopifnot("couldn't calculate coefficients. Data is probably poor conditioned"
+              = !is.nan(beta))
 
     # calculate predicted values on original scale
     # Get mean and sd from the training data X
@@ -99,9 +101,6 @@ ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
   }
   # Close progress bar
   close(pb)
-
-  #browser()
-
 
   MSPE_cv = colMeans(mspe_temp)
   min_lambda_index <- which.min(MSPE_cv)

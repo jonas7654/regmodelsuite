@@ -1,11 +1,32 @@
 lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
+  X_scaled <- scale(X, scale = T)
+  y_demeaned <- scale(y , scale = F)
+
+
   if (lambda == 0) {
-    OLS <- lm.fit(X, y)$coefficients # solve(t(X) %*% X, t(X) %*% y)
+    beta <- lm.fit(X_scaled, y_demeaned)$coefficients # solve(t(X) %*% X, t(X) %*% y)
     if (ncol(X) >= nrow(X)) {
       warning("The matrix X suffers from multicollinearity")
     }
-    return(list(coefficients = OLS))
+
+    # Output section
+    y_hat <- attr(y_demeaned, "scaled:center") + X_scaled %*% beta
+    r2 <- calculate_R2(y , y_hat)
+    dim(r2) <- c(length(r2), 1)
+
+
+    lasso_obj <- list(coefficients = beta,
+                      lambda = lambda,
+                      R2 = r2,
+                      y = y,
+                      mean_y = attr(y_demeaned, "scaled:center"),
+                      mean_x = attr(X_scaled, "scaled:center"),
+                      sd_x = attr(X_scaled, "scaled:scale"),
+                      model = X_scaled,
+                      n = n
+    )
+
   }
 
 
@@ -14,8 +35,7 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
 
 
   # Init
-  X_scaled <- scale(X, scale = T)
-  y_demeaned <- scale(y , scale = F)
+
   beta <- double(p)
   max_abs_beta_diff <- Inf
 
@@ -61,6 +81,9 @@ lasso <- function(X, y, lambda,  tol = 1e-07, verbose = F) {
     m <- m + 1
 
   }
+
+  stopifnot("couldn't calculate coefficients. Data is probably poor conditioned"
+            = !is.nan(beta))
 
 
   # Output section

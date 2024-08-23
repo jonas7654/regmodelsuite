@@ -61,7 +61,12 @@ least_angle_regression <- function(X, y, verbose = F) {
     else {
       alpha_neg <- (C_max - C_j[!active_variables]) / ((1 / sqrt_w) - B[!active_variables, ])
       alpha_pos <- (C_max + C_j[!active_variables]) / ((1 / sqrt_w) + B[!active_variables, ])
-      alpha <- min(c(alpha_neg[alpha_neg >= 0], alpha_pos[alpha_pos >= 0], 0), na.rm = TRUE)
+      alpha <- suppressWarnings(min(c(alpha_neg[alpha_neg >= 0], alpha_pos[alpha_pos >= 0]),
+                                    na.rm = TRUE))
+    }
+
+    if (alpha == Inf) {
+      alpha <- 0
     }
 
 
