@@ -125,13 +125,14 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
     y_reg <- scale(ytrainData,scale = FALSE) # demean
 
     # --- Perform LASSO Regression --- #
+
     # Funktionsfabrik
-    lasso_estimator <- lasso_cv_calculation(x_reg, y_reg)
+    #lasso_estimator <- lasso_cv_calculation(x_reg, y_reg)
 
     # Estimate coefficients for all lambdas
 
     for (l in 1:nlambda) {
-      beta[ , l] <- lasso_estimator(lambda[l])
+      beta[ , l] <- lasso(x_reg, y_reg, lambda[l])$coefficients   #lasso_estimator(lambda[l])
     }
 
     stopifnot("couldn't calculate coefficients. Data is probably poor conditioned"
