@@ -1,0 +1,111 @@
+---
+title: "Using the lasso estimator with regmodelsuite"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{lasso}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+This vignette demonstrates how to estimate a LASSO regression model using the `regmodelsuite` package. LASSO is a type of linear regression that includes a penalty to shrink some coefficients to zero, effectively performing variable selection.
+
+First we are going to create some example Data where the number of predictors
+is greater than the number of observations p >> n
+
+```{r}
+library(regmodelsuite)
+library(ggplot2)
+
+set.seed(123)  # For reproducibility
+
+# Parameters
+n <- 400  # Number of observations
+p <- 300  # Number of predictors
+
+# Generate predictor matrix (X) with normal distributed values
+X <- matrix(rnorm(n * p), nrow = n, ncol = p)
+
+# Create a true coefficient vector
+beta_true <- rnorm(p)
+
+# zero out some coefficients
+beta_true[abs(beta_true) < 0.5] <- 0
+
+# Generate response variable (y) as a linear combination of predictors + noise
+y <- X %*% beta_true + rnorm(n)
+
+# Convert to data frame
+df <- data.frame(X)
+df$y <- y
+
+
+# Split the dataset into a training and test set (50/50)
+Indexes <- sample(1:(nrow(df) * 0.5))
+
+training_set <- df[Indexes , ]
+test_set <- df[-Indexes , ]
+
+dim(df)
+dim(training_set)
+dim(test_set)
+
+```
+To estimate a lasso model the user has to supply a formula into the regmodel
+function. We are going to add all p predictors.
+
+Here we use the pre calculated lambda grid with 10 lambdas with 5 folds for
+cross validation.
+```{r}
+# seed for reproducebillity
+set.seed(2302)
+model_formula <- y ~ .
+lassoCV <- regmodel(model_formula, data = training_set, model = "lasso", cv = T,
+                    nlambda = 10, m = 5)
+
+min_lambda <- lassoCV$min_lambda
+min_lambda
+
+print(lassoCV)
+
+
+```
+The "lasso_fit" object contains information about the cross validation process. To use the estimated lambda for the final model we can use \code{regmodel} again
+
+```{r}
+lasso_fit <- regmodel(model_formula,
+                      data = training_set,
+                      model = "lasso",
+                      lambda = min_lambda)
+
+print(lasso_fit)
+
+
+
+```
+
+Predictions can be done by using the \code{predict()} function.
+Just calling predict on a lasso object will use the training data set for 
+predictions. By specifying \code{newdata}, the estimated model will be applied to 
+the new data.
+
+```{r}
+pred_insample <- predict(lasso_fit)
+print(pred_insample)
+
+cat("----------------------------------------------------------- \n \n")
+
+# Now use the test set
+pred_outofsample <- predict(lasso_fit, newdata = test_set)
+print(pred_outofsample)
+
+# Calculate the Mean squared prediction error
+mean((pred_outofsample - test_set$y)^2)
+```
+
+We can visualize the Mean squared prediction error
+```{r}
+plot(log(lassoCV$lambda_grid), lassoCV$MSPE)
+```
+

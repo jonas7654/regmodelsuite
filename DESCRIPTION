@@ -1,12 +1,21 @@
 Package: regmodelsuite
-Title: What the Package Does (One Line, Title Case)
+Title: Estimate regression models
 Version: 0.0.0.9000
 Authors@R: 
     person("Jonas", "Veit", , "mee322@uni-heidelberg.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: Implements common penalty based estimation methods i.e Ridge, 
+    Lasso, Forward selection, Backward selection and Least angle regresion.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+VignetteBuilder: knitr
+Imports:
+    tidyr,
+    ggplot2

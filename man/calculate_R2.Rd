@@ -7,12 +7,12 @@
 calculate_R2(y, yhat)
 }
 \arguments{
-\item{y}{response vector}
+\item{y}{Response vector (observed values)}
 
-\item{yhat}{fitted values}
+\item{yhat}{Fitted values (predicted values)}
 }
 \value{
-R-Squared
+R-Squared statistic
 }
 \description{
 Calculate model R-Squared

@@ -2,27 +2,145 @@
 % Please edit documentation in R/regmodel.R
 \name{regmodel}
 \alias{regmodel}
-\title{Wrapper Function for the regmodelsuit package.}
+\title{Wrapper function for the regmodelsuit package}
 \usage{
-regmodel(formula = NULL, data = NULL, model = NULL, lambda = 0, cv = FALSE)
+regmodel(
+  formula = NULL,
+  data = NULL,
+  model = NULL,
+  lambda = NULL,
+  cv = FALSE,
+  m = 10,
+  nlambda = 100,
+  n_predictors = NULL,
+  model_fct = lm,
+  verbose = TRUE
+)
 }
 \arguments{
-\item{data}{A data frame which contains the corresponding variables}
+\item{formula}{A formula object which specifies the model}
 
-\item{model}{Specifies the model to be estimated.
-c("ridge","lasso","forward","backward","LAR")}
+\item{data}{A data frame which contains the corresponding variables. If no
+data frame is provided then the function will recursively search for
+variables specified by the formula. The variables have to be defined in one
+of the functions parent environments up to the global environment.}
 
-\item{lambda}{penalty parameter for ridge and lasso estimation. If cv = TRUE
-lambda will be ignored All of them are tested to find the optimal lambda
-with regards to the chosen regmodel}
+\item{model}{A string with the model to be estimated. Following models are
+supported
+\itemize{
+\item "ridge"
+\item "lasso"
+\item "forward"
+\item "backward"
+\item "LAR"
+}}
 
-\item{formua}{A formula object which specifies the model}
+\item{lambda}{A numeric value which defines the penalty parameter for ridge
+and lasso estimation. \cr If using cross validation, it is a numeric vector
+with at least length 2. If no lambda is given, cross validation will
+generate default values. The generated lambda grid is scaled by the total
+number of lambdas (\code{nlambda}) to account for sample size. (Only for ridge and Lasso)}
 
-\item{regmodel}{Logical value which specifies if cross validation for lambda should be used}
+\item{cv}{A logical value which specifies if cross validation should be used. (Only for ridge and Lasso)}
+
+\item{m}{An integer for the amount of folds when using cross validation. (Only for ridge and Lasso)}
+
+\item{nlambda}{An integer that defines the amount of values that are
+generated as default lambdas in cross validation.}
+
+\item{n_predictors}{An integer which defines the amount of predictors to
+select for forward or backward selection.}
+
+\item{model_fct}{A function which specifies the model used for forward or
+backward selection. Needs to have the parameters \code{formula} and
+\code{data} and needs to return and object with a \code{predict} function
+implemented.}
+
+\item{verbose}{A logical which specifies if forward and and backward
+selection print their selection process.}
 }
 \value{
-Model List
+The function returns an S3 object, the structure of which depends on the model chosen:
+\itemize{
+\item For "ridge" and "lasso", the object contains:
+\itemize{
+\item \code{coefficients} - The estimated coefficients.
+\item \code{lambda} - The penalty parameter used.
+\item \code{R2} - Calculated R-Squared
+\item \code{mean_y} - Mean of the response variable
+\item \code{mean_x} - Means of the Covariates
+\item \code{sd_x} - Standard Deviations of the Covariates
+\item \code{model} - Model Matrix containing the standardized Covariates
+\item \code{y} - unscaled response variable
+\item \code{n} - sample size
+\item \code{p} - number of Covariates
+}
+\item For \strong{Lasso} there are these additional outputs
+\itemize{
+\item \code{Iterations} - number of iterations
+\item \code{active_variables} - Variables that were not set to zero
+\item \code{inactive_variables} - Variables that were set to zero
+}
+\item For "forward" and "backward", the object contains:
+\itemize{
+\item \code{predictors} - The selected predictors.
+\item \code{error} - The average error of the final model.
+\item \code{direction} - The direction used.
+\item \code{errors} - The errors of all the tested models.
+\item \code{start_predictors} - The first amount of predictors tested.
+}
+}
 }
 \description{
-Wrapper Function for the regmodelsuit package.
+Wrapper function for the regmodelsuit package
+}
+\details{
+\strong{Ridge Regression} minimizes the following objective function:
+\deqn{L(\beta) = (Y - Xb)' (Y - Xb) + \lambda \beta'\beta} where
+\eqn{\lambda} is the penalty parameter that controls the amount of shrinkage
+applied to the coefficients \eqn{\beta}.
+
+When no lambda grid is specified for cross validation, the grid creation
+process for \code{lambda} is as follows:
+\itemize{
+\item A range of ratios is specified, from 0.002 to 50.
+\item The logarithms of these minimum and maximum values are computed to emphasize smaller lambda values.
+\item A sequence of evenly spaced values is generated on the logarithmic scale.
+\item The sequence is exponentiated to produce the actual lambda values.
+\item Finally, these lambda values are scaled by \code{nlambda}, the number of lambda values generated, to finalize the grid.
+}
+
+\strong{Lasso Regression} minimizes the following objective function:
+\deqn{L(\beta) = (Y - Xb)' (Y - Xb) + \lambda \sum(|\beta|)} where lambda
+is the penalty parameter.
+
+\strong{Least Angle Regression}
+
+\itemize{
+\item At each step, LAR moves the coefficient of the most correlated predictor with the response variable towards its least-squares value.
+\item The process continues until all predictors are included in the model or the desired number of predictors is reached. But at most \eqn{min(n - 1, p)} times
+\item For a more detailed description of the algorithm see Hastie, Tibshirani, and Friedman (2009)
+}
+
+\strong{Forward Selection} finds a subset of predictors, with a specified size,
+for a regression model. This method starts with an empty model and adds
+predictors one by one. At each step, the predictor that results in
+the lowest error is added to the model. This process continues until the
+specified number of predictors is selected.
+
+\strong{Backward Selection} finds a subset of predictors, with a specified
+size, for a regression model. This method starts with all predictors and
+removes them one by one. At each step, the predictor with the
+lowest contribution to the model (lowest Z-score) is removed.
+This process continues until the specified number of predictors is reached.
+
+For more details on the methodology, see Hastie, Tibshirani, and Friedman
+(2009). As well as Richter, Stefan. "Statistisches und maschinelles Lernen."
+Berlin/Heidelberg (2019).
+}
+\references{
+Hastie, T., Tibshirani, R., & Friedman, J. (2009). \emph{The
+Elements of Statistical Learning: Data Mining, Inference, and Prediction}
+(2nd ed.). Springer. Richter, Stefan. "Statistisches und maschinelles Lernen."
+Berlin/Heidelberg (2019).
 }
