@@ -2,10 +2,11 @@ Package: regmodelsuite
 Title: Estimate regression models
 Version: 0.0.0.9000
 Authors@R: 
-    person("Jonas", "Veit", , "mee322@uni-heidelberg.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Implements common penalty based estimation methods i.e Ridge, 
-    Lasso, Forward selection, Backward selection and Least angle regresion.
+    c(person("Jonas", "Veit", , "mee322@uni-heidelberg.com", role = c("aut")),
+    person("Pitt", "Junker", , "pitt.junker@stud.uni-heidelberg.com", role = c("aut"))
+    )
+Description: Implements Ridge, Lasso, Forward selection, Backward selection and 
+    Least angle regression and also offers m-fold Cross Validation.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

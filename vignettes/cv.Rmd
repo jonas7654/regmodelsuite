@@ -60,10 +60,10 @@ ridge_cv <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5) + X4 + X5,
                 data = df,
                 model = "ridge",
                 cv = TRUE,
-                lambda = seq(0.01, 1000, by = 0.008))
+                lambda = seq(0.01, 500, by = 0.008))
 
 # Optimal lambda for Ridge Regression
-print(ridge_cv)
+ridge_cv$min_lambda
 ```
 
 ridge_cv is an object with the class "ridge_cv" and "cv" now contains useful information, most importantly the optimal lambda, 
@@ -128,6 +128,5 @@ ridge_cv <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5) + X4 + X5,
                 model = "ridge",
                 cv = TRUE,
                 m = 5)
-print(ridge_cv)
 plot(ridge_cv)
 ```

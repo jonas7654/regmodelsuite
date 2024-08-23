@@ -6,10 +6,16 @@
 \alias{regmodelsuite-package}
 \title{regmodelsuite: Estimate regression models}
 \description{
-Implements common penalty based estimation methods i.e Ridge, Lasso, Forward selection, Backward selection and Least angle regresion.
+Implements Ridge, Lasso, Forward selection, Backward selection and Least angle regression and also offers m-fold Cross Validation.
 }
 \author{
-\strong{Maintainer}: Jonas Veit \email{mee322@uni-heidelberg.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: 
+
+Authors:
+\itemize{
+  \item Jonas Veit \email{mee322@uni-heidelberg.com}
+  \item Pitt Junker \email{pitt.junker@stud.uni-heidelberg.com}
+}
 
 }
 \keyword{internal}
