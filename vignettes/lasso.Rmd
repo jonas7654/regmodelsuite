@@ -10,7 +10,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Generae Test Data
+## Generate Test Data
 
 This vignette demonstrates how to estimate a LASSO regression model using the `regmodelsuite` package. LASSO is a type of linear regression that includes a penalty to shrink some coefficients to zero, effectively performing variable selection.
 
@@ -23,8 +23,8 @@ library(regmodelsuite)
 set.seed(1443)  # For reproducibility
 
 # Parameters
-n <- 40  # Number of observations
-p <- 30  # Number of predictors
+n <- 50  # Number of observations
+p <- 100  # Number of predictors
 
 # Generate predictor matrix (X) with normal distributed values
 X <- matrix(rnorm(n * p), nrow = n, ncol = p)

@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 
 This vignette demonstrates how to estimate a Least angle regression model 
-using the \code{regmodelsuite} package. 
+using the `regmodelsuite` package. 
 
 ## Generate Test Data
 
@@ -55,8 +55,6 @@ the \code{regmodel} function. We are going to add all p predictors.
 
 
 ```{r, results = "hide", message = FALSE, warning = FALSE}
-set.seed(23025)
-
 model_formula <- y ~ .
 
 fit_LAR <- regmodel(model_formula, data = df, model = "LAR")
