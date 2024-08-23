@@ -1,0 +1,101 @@
+---
+title: "Ridge"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Ridge}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This vignette demonstrates how to estimate a Ridge regression model using the `regmodelsuite` package. Ridge is a type of linear regression that includes a penalty to shrink some coefficients.
+
+First we are going to create some example Data where the number of predictors
+is greater than the number of observations p >> n
+
+```{r}
+library(regmodelsuite)
+
+set.seed(123)  # For reproducibility
+
+# Parameters
+n <- 200  # Number of observations
+p <- 600  # Number of predictors
+
+# Generate predictor matrix (X) with normal distributed values
+X <- matrix(rnorm(n * p), nrow = n, ncol = p)
+
+# Create a true coefficient vector
+beta_true <- rnorm(p)
+
+# zero out some coefficients
+beta_true[abs(beta_true) < 0.5] <- 0
+
+# Generate response variable (y) as a linear combination of predictors + noise
+y <- X %*% beta_true + rnorm(n)
+
+# Convert to data frame
+df <- data.frame(X)
+df$y <- y
+
+
+# Split the dataset into a training and test set (50/50)
+Indexes <- sample(1:(nrow(df) * 0.5))
+
+training_set <- df[Indexes , ]
+test_set <- df[-Indexes , ]
+```
+To estimate a ridge model the user has to supply a formula into the regmodel
+function.
+
+
+```{r}
+# seed for reproducebillity
+set.seed(2302)
+model_formula <- y ~ .
+ridgeCV <- regmodel(model_formula, data = training_set, model = "ridge", cv = T)
+
+min_lambda <- ridgeCV$min_lambda
+
+print(ridgeCV)
+
+
+```
+The "ridge_fit" object contains information about the cross validation process. To use the estimated lambda for the final model we can use \code{regmodel} again
+
+```{r}
+ridge_fit <- regmodel(model_formula,
+                      data = training_set,
+                      model = "ridge",
+                      lambda = min_lambda)
+
+print(ridge_fit)
+```
+In this case three variables were selected by the ridge model
+
+Predictions can be done by using the \code{predict()} function.
+Just calling predict on a ridge object will use the training data set for 
+predictions. By specifying \code{newdata}, the estimated model will be applied to 
+the new data.
+
+```{r}
+pred_insample <- predict(ridge_fit)
+print(pred_insample)
+
+# Now use the test set
+pred_outofsample <- predict(ridge_fit, newdata = test_set)
+```
+
+We can visualize the predictions using ggplot2
+```{r}
+
+```
+

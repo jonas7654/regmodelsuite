@@ -54,11 +54,20 @@ n <- 100
 X1 <- runif(n, min = 0, max = 1)
 X2 <- -X1**3
 X3 <- 0.2*X1**5
+X4 <- runif(n, min = 0, max = 1)
+X5 <- runif(n, min = 0, max = 1)
+X6 <- runif(n, min = 0, max = 1)
+X7 <- runif(n, min = 0, max = 1)
+X8 <- runif(n, min = 0, max = 1)
+X9 <- runif(n, min = 0, max = 1)
+X10 <- runif(n, min = 0, max = 1)
 
 # Add noise to y
 y <- X1 + X2 + X3 + rnorm(n, mean = 0, sd = 0.3)
 
-df <- data.frame(X1 = X1, y = y)
+df <- data.frame(X1 = X1, X4 = X4, X5 = X5, X6 = X6, 
+                 X7 = X7, X8 = X8, X9 = X9, X10 = X10, 
+                 y = y)
 ```
 
 ## How to use cross validation in regmodelsuite
@@ -68,10 +77,12 @@ model is chosen. To execute cross validation, set cv = TRUE and select the chose
 
 ```{r}
 # Run Cross Validation for ridge
-ridge_cv <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5),
+ridge_cv <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5) + X4 + 
+                       X5 + X6 + X7 + X8 + X9 + X10,
                 data = df,
                 model = "ridge",
-                cv = TRUE)
+                cv = TRUE,
+                lambda = seq(0.001, 1, by = 0.001/100))
 
 # Optimal lambda for Ridge Regression
 print(ridge_cv)
@@ -84,12 +95,13 @@ regression.
 ```{r}
 ridge_cv$min_lambda
 
-result_ridge <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5),
+result_ridge <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5) + X4 + 
+                           X5 + X6 + X7 + X8 + X9 + X10,
                 data = df,
                 model = "ridge",
                 lambda = ridge_cv$min_lambda)
 
-result_ridge$coefficients/result$sd_x
+result_ridge$coefficients/result_ridge$sd_x
 ```
 You can also plot cv objects, to see how the coefficients changed based on the tested lambdas.
 
