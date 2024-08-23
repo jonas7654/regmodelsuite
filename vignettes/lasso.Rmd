@@ -20,11 +20,11 @@ is greater than the number of observations p > n
 ```{r}
 library(regmodelsuite)
 
-set.seed(1443)  # For reproducibility
+set.seed(5232)  # For reproducibility
 
 # Parameters
-n <- 50  # Number of observations
-p <- 100  # Number of predictors
+n <- 200  # Number of observations
+p <- 200  # Number of predictors
 
 # Generate predictor matrix (X) with normal distributed values
 X <- matrix(rnorm(n * p), nrow = n, ncol = p)
@@ -60,7 +60,7 @@ cat("Test set dimensions: ", dim(test_set), "\n")
 To estimate a lasso model with cross validation the user has to supply a formula 
 into the regmodel function. We are going to add all p predictors.
 
-Here we let the \code{regmodel} function create a lambda grid with 10 lambdas
+Here we let the `regmodel` function create a lambda grid with 10 lambdas
 with 5 folds for cross validation.
 ```{r, results = "hide", message = FALSE, warning = FALSE}
 set.seed(2302)
@@ -99,16 +99,16 @@ print(lassoCVmanual)
 
 ## Estimating the final model
 
-The \texttt{lassoCVmanual} object contains information about the cross validation 
+The `lassoCV` object contains information about the cross validation 
 process. To use the estimated lambda for the final model we can use
-\code{regmodel} again.It is also possible to extract scaled and unscaled 
-coefficients from the model by using \code{coef}.
+`regmodel` again.It is also possible to extract scaled and unscaled 
+coefficients from the model by using `coef`.
 
 ```{r}
 lasso_fit <- regmodel(model_formula,
                       data = training_set,
                       model = "lasso",
-                      lambda = lassoCVmanual$min_lambda)
+                      lambda = lassoCV$min_lambda)
 
 # scaled coefficients
 coef(lasso_fit)
