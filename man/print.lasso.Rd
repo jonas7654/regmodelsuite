@@ -4,7 +4,10 @@
 \alias{print.lasso}
 \title{print function for the lasso object}
 \usage{
-\method{print}{lasso}(x, ...)
+\method{print}{lasso}(x)
+}
+\arguments{
+\item{x}{a S3 lasso object estimated by regmodel}
 }
 \description{
 print function for the lasso object

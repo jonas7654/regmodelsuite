@@ -14,43 +14,133 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+# Introduction
+
+This vignette demonstrates how to do m-fold cross validation using the `regmodelsuite` package. Cross validation is a technique to determine the optimal lambda for the linear regression models LASSO and Ridge. The lambda determines how much unwanted terms are punished in LASSO and Ridge. Choosing a different lambda changes the resulting coefficients of the regression models and an optimal lambda
+would one, that leads to coefficients, which minimize the mean squared
+prediction error.
+
+# Installation
+
+To use the `regmodelsuite` package, you need to install it first:
+
+\`\`\`r \# If it's available on CRAN install.packages("regmodelsuite")
+
+Or install the development version from GitHub
+
+# install.packages("devtools")
+
+devtools::install_github("jonas7654/regmodelsuite")
+
+
+
+
 ```{r setup}
 library(regmodelsuite)
 ```
 
 ## Example Data
 
-Before using regmodelsuite, we generate an arbitrary data set:
+Before using regmodelsuite, we generate the data set from Example 2.15 of the book "Statistisches und maschinelles Lernen." (2019) from Richter et. al.
 
 ```{r}
-# Erstelle einen Datensatz mit 100 Beobachtungen und 10 Prädiktoren
+# Set seed for reproducibility
+set.seed(123)
+
+# Create a data set with 100 observations
 n <- 100
-p <- 10
 
-# Zufällige Werte für Prädiktoren (X)
-X <- matrix(rnorm(n * p), n, p)
+X1 <- runif(n, min = 0, max = 1)
+X2 <- -X1**3
+X3 <- 0.2*X1**5
 
-# Wahre Koeffizienten
-beta <- c(1, 0.5, -0.5, 0.7, -0.2, rep(0, p - 5))
+# Add noise to y
+y <- X1 + X2 + X3 + rnorm(n, mean = 0, sd = 0.3)
 
-# Zielvariable y mit etwas Rauschen
-y <- X %*% beta + rnorm(n)
-
-# Konvertiere in einen DataFrame
-data <- data.frame(y = y, X)
+df <- data.frame(X1 = X1, y = y)
 ```
 
 ## How to use cross validation in regmodelsuite
 
 Regmodelsuite provides the wrapper function regmodel(...) which executes whichever
-model is chosen. To execute cross validation, set cv = TRUE.
+model is chosen. To execute cross validation, set cv = TRUE and select the chosen model. 
 
 ```{r}
-regmodel(formula = y ~ ., data = data, model = "ridge", cv = TRUE)
+# Run Cross Validation for ridge
+ridge_cv <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5),
+                data = df,
+                model = "ridge",
+                cv = TRUE)
+
+# Optimal lambda for Ridge Regression
+print(ridge_cv)
 ```
 
-In this example, we chose the ridge model for cross validation. The regmodelsuite
-package supports cross validation for lasso and ridge. 
+ridge_cv is an object with the class "ridge_cv" and "cv" now contains useful information, most importantly the optimal lambda, 
+which can be used for ridge regression. Using this, we can now do the corresponding
+regression.
+
+```{r}
+ridge_cv$min_lambda
+
+result_ridge <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5),
+                data = df,
+                model = "ridge",
+                lambda = ridge_cv$min_lambda)
+
+result_ridge$coefficients/result$sd_x
+```
+You can also plot cv objects, to see how the coefficients changed based on the tested lambdas.
+
+```{r}
+plot(ridge_cv)
+```
+Let's repeat the whole procedure for LASSO:
+
+```{r}
+lasso_cv <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5),
+                data = df,
+                model = "lasso",
+                cv = TRUE)
+plot(lasso_cv)
+```
+Now, we can not see how the coefficients changed. That is because the optimal lambda is 
+the smallest lambda of the default lambda grid. 
+
+```{r}
+lasso_cv$lambda_grid
+```
+
+## Optional Arguments
+
+# lambda 
+
+You can provide your own lambda grid to the regmodel function, which will be used during
+cross validation.
+
+```{r}
+lasso_cv <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5),
+                data = df,
+                model = "lasso",
+                cv = TRUE,
+                lambda = seq(0.001, 0.201, by = 0.1/100))
+plot(lasso_cv)
+```
+
+# m
+
+You can also adjust the amount of folds used during cross validation. Generally, m = 5 or m = 10 is recommended. A higher m will lead to longer computation, which is why m = 10 is the default in our package. 
+
+```{r}
+ridge_cv <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5),
+                data = df,
+                model = "ridge",
+                cv = TRUE,
+                m = 5)
+print(ridge_cv)
+plot(ridge_cv)
+```
 
 ## Optional arguments
 
