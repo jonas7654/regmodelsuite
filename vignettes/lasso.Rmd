@@ -71,7 +71,10 @@ print(lassoCV)
 
 
 ```
-The "lasso_fit" object contains information about the cross validation process. To use the estimated lambda for the final model we can use \code{regmodel} again
+The "lasso_fit" object contains information about the cross validation process. 
+To use the estimated lambda for the final model we can use \code{regmodel} again. 
+It is also possible to extract scaled and unscaled coefficients from the model
+by using coef().
 
 ```{r}
 lasso_fit <- regmodel(model_formula,
@@ -81,6 +84,11 @@ lasso_fit <- regmodel(model_formula,
 
 print(lasso_fit)
 
+# scaled coefficients
+coef(lasso_fit)
+
+# unscaled coefficients
+coef(lasso_fit, unscale = TRUE)
 
 
 ```
