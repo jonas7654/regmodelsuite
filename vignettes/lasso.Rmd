@@ -20,8 +20,8 @@ library(regmodelsuite)
 set.seed(123)  # For reproducibility
 
 # Parameters
-n <- 200  # Number of observations
-p <- 1000  # Number of predictors
+n <- 50  # Number of observations
+p <- 60  # Number of predictors
 
 # Generate predictor matrix (X) with normal distributed values
 X <- matrix(rnorm(n * p), nrow = n, ncol = p)
@@ -60,11 +60,12 @@ function.
 set.seed(2302)
 model_formula <- y ~ .
 lassoCV <- regmodel(model_formula, data = training_set, model = "lasso", cv = T,
-                    nlambda = 5)
+                    nlambda = 10, m = 5)
 
 min_lambda <- lassoCV$min_lambda
+min_lambda
 
-print(ridgeCV)
+print(lassoCV)
 
 
 ```
@@ -74,7 +75,7 @@ The "lasso_fit" object contains information about the cross validation process. 
 lasso_fit <- regmodel(model_formula,
                       data = training_set,
                       model = "lasso",
-                      lambda = min_lambda)
+                      lambda = 0.02)
 
 print(lasso_fit)
 ```
