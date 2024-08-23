@@ -102,6 +102,9 @@ forward_selection <- function(X, y, n_predictors, model_fct = lm,
 #'
 #' @return A stepwise_selection object
 backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRUE) {
+  stopifnot("More data points than predictors required of backward selection."
+            = nrow(X) > ncol(X))
+
   # Combining X and y and converting to data frame
   X <- data.frame(cbind(X, y))
 
@@ -110,6 +113,9 @@ backward_selection <- function(X, y, n_predictors, model_fct = lm, verbose = TRU
   used_predictors <- colnames(X)[-ncol(X)]
   errors <- c()
   iterations <- length(used_predictors) - n_predictors + 1
+
+  stopifnot("Can not select that many predictors."
+            = iterations > 1)
 
   for(i in 1:iterations) {
 

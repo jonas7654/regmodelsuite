@@ -187,9 +187,6 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
     stopifnot("n_predictors must be numeric" = is.numeric(n_predictors))
     stopifnot("n_predictors has to be bigger than 0." = n_predictors > 0)
     stopifnot("n_predictors must be a single number" = length(n_predictors) == 1)
-
-    stopifnot("More data points than predictors required of backward selection."
-              = model != "backward" || nrow(X) > ncol(X))
   }
 
 
