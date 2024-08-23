@@ -9,7 +9,7 @@
 
 
 
-coef.lasso <- function(object, unscale = T) {
+coef.lasso <- function(object, unscale = FALSE) {
   stopifnot("object must be of type lasso" = inherits(object, "lasso"))
 
   betas <- object$coefficient

@@ -4,10 +4,13 @@
 \alias{coef.ridge}
 \title{Extract coefficients from an estimated ridge model}
 \usage{
-\method{coef}{ridge}(object)
+\method{coef}{ridge}(object, unscale = FALSE)
 }
 \arguments{
 \item{object}{A ridge S3 Object}
+
+\item{unscale}{If TRUE, the coefficients will be scaled back to the original
+scale}
 }
 \value{
 ridge coefficients from regobject

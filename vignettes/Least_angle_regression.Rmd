@@ -1,0 +1,136 @@
+---
+title: "Least angle regression with regmodelsuite"
+output: 
+  rmarkdown::html_vignette:
+    toc: true          
+    toc_depth: 2     
+vignette: >
+  %\VignetteIndexEntry{Least angle regression with regmodelsuite}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+This vignette demonstrates how to estimate a Least angle regression model 
+using the `regmodelsuite` package. 
+
+## Generate Test Data
+
+First we are going to create some example data where the number of predictors
+is greater than the number of observations p > n.
+In addition to that only a few variables are relevant in order to predict the
+population.
+
+```{r, setup}
+library(regmodelsuite)
+
+set.seed(1337)  # For reproducibility
+
+n <- 100    # Number of observations
+p <- 200  # Number of predictors
+
+X <- matrix(rnorm(n*p), nrow=n, ncol=p)
+
+beta <- c(rep(2, 5), rep(0, p-5))  # Only the first 5 predictors are relevant
+
+y <- X %*% beta + rnorm(n)
+
+df <- data.frame(y,X)
+
+dim(df)
+```
+
+## Estimation
+
+To estimate a least angle regression model the user has to supply a formula into
+the \code{regmodel} function. We are going to add all p predictors.
+
+
+```{r, results = "hide", message = FALSE, warning = FALSE}
+model_formula <- y ~ .
+
+fit_LAR <- regmodel(model_formula, data = df, model = "LAR")
+```
+\ 
+It is possible to extract the scaled and unscaled coefficients by using coef() 
+on the LAR object
+```{r}
+cat("Scaled: ", coef(fit_LAR), "\n")
+cat("Unscaled: ", coef(fit_LAR, unscale = TRUE))
+
+```
+
+## Prediction
+
+It is possible to use this regression object to predict the response variable.
+Here we assume that we receive a new sample from the same population.
+The plot below shows the response variable y and the red triangles depict the
+predicted values
+```{r, fig.width=6, fig.height=4}
+set.seed(555)
+
+# Parameters
+n <- 100  # Number of observations
+p <- 200  # Number of predictors
+
+X <- matrix(rnorm(n*p), nrow=n, ncol=p)
+
+beta <- c(rep(2, 5), rep(0, p-5))  # Only the first 5 predictors are relevant
+
+y_new <- X %*% beta + rnorm(n)
+
+# Convert to data.frame
+X <- as.data.frame(X)
+
+# Predicting
+pred <- predict(fit_LAR, newdata = X)
+pred
+
+# Calculating Mean Squared Prediction Error
+mean((pred - y_new)^2)
+
+{plot(df$y); points(pred, col = "red",pch = 2)}
+```
+\ 
+
+## Plot the coefficient path
+
+With the plot() function, the coefficient path can be visualized.
+This is only feasible when the amount of variables is not too large since the
+plot can get quite overcrowed.
+
+Here we estimate a smaller model.
+```{r}
+set.seed(1378)
+
+# Parameters
+n <- 2000  # Number of observations
+p <- 15 # Number of predictors
+
+X <- matrix(rnorm(n*p), nrow=n, ncol=p)
+
+beta <- rnorm(p)  # Only the first 5 predictors are relevant
+
+y_new <- X %*% beta + rnorm(n)
+
+df <- data.frame(y_new,X)
+
+fit_LAR_small <- regmodel(y_new ~ . , data = df, model = "LAR")
+coef(fit_LAR_small)
+
+
+```
+Use plot() to visualize the coefficient path
+
+```{r, fig.width=6, fig.height=4}
+plot(fit_LAR_small)
+```
+

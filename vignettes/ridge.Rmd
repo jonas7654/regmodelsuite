@@ -3,12 +3,6 @@ title: "Ridge"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Ridge}
-=======
-title: "Ridge Regression with Custom Function"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Ridge Regression with Custom Function}
->>>>>>> 30cd6c235c07828bb55b9a06058fbf081a3e9612
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -22,13 +16,13 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-<<<<<<< HEAD
 This vignette demonstrates how to estimate a Ridge regression model using the `regmodelsuite` package. Ridge is a type of linear regression that includes a penalty to shrink some coefficients.
 
 First we are going to create some example Data where the number of predictors
 is greater than the number of observations p >> n
 
 ```{r}
+library(ggplot2)
 library(regmodelsuite)
 
 set.seed(123)  # For reproducibility
@@ -73,10 +67,8 @@ ridgeCV <- regmodel(model_formula, data = training_set, model = "ridge", cv = T)
 min_lambda <- ridgeCV$min_lambda
 
 print(ridgeCV)
-
-
 ```
-The "ridge_fit" object contains information about the cross validation process. To use the estimated lambda for the final model we can use \code{regmodel} again
+The "ridge_fit" object contains information about the cross validation process. To use the estimated lambda for the final model we can use regmodel again
 
 ```{r}
 ridge_fit <- regmodel(model_formula,
@@ -101,49 +93,17 @@ print(pred_insample)
 pred_outofsample <- predict(ridge_fit, newdata = test_set)
 ```
 
-We can visualize the predictions using ggplot2
+We can visualize the predictions over one of the parameters using plot. We choose the first parameter
+```{r} 
+plot(ridge_fit,1)
+```
+
+Or compare the predictions of the test data with the actual y of the test data. The pink crosses are the real values from the test data and the turquoise dots are the predicted values.
 ```{r}
-
+df <- data.frame(X = test_set[1], y = pred_outofsample)
+ggplot(df, aes(x = X1, y = y)) +
+      geom_point(color = "darkslategray3", size = 1) +
+      labs(title = "Testdata and Prediction", x = "X1", y = "y") +
+      geom_point(data = test_set, aes(x = X1, y = y), shape = 4, color = "deeppink3", size = 1) +
+      theme_minimal()
 ```
-
-This vignette demonstrates how to do ridge regression using the `regmodelsuite` package.
-
-```{r setup}
-library(regmodelsuite)
-```
-
-## Example data
-
-```{r}
-set.seed(21)
-n <- 100
-d <- 10
-testlambda <- 0.1
-
-#data X independent and equally distributed on [0,1]
-X <- matrix(runif(n * d), n, d)
-
-#real values of beta
-beta <- runif(d, min = -1, max = 1) 
-
-#measured y with normally distributed measurement error N(0,0.3^2)
-y <- X %*% real_ridge + rnorm(n, mean = 0, sd = 0.3)
-
-#datafram
-df <- data.frame(X)
-df$y <- y
-```
-
-## Basic usage of the ridge function
-
-```{r}
-ridge <- regmodel(data=df, model = "ridge", lambda = testlambda)
-print(ridge)
-```
-
-You can also plot your ridgeobject:
-
-```{r}
-plot(ridge)
-```
-
