@@ -3,10 +3,6 @@ title: "Ridge"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Ridge}
-title: "Ridge Regression with Custom Function"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Ridge Regression with Custom Function}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
