@@ -1,3 +1,5 @@
+#' Print function for the ridge object
+#' @param x a S3 ridge object estimated by ridge
 #' @export
 
 print.ridge <- function(ridgeobj) {
