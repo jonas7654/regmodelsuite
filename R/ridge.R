@@ -7,6 +7,8 @@ ridge <- function(X,y, lambda = 0){
 
   ridge_coefficients <- solve(X_scaled_transposed %*% X_scaled + lambda * diag(ncol(X)),
                               X_scaled_transposed %*% y_demeaned)
+  stopifnot("couldn't calculate coefficients. Data is probably poor conditioned"
+            = !is.nan(ridge_coefficients))
 
   y_hat <- attr(y_demeaned, "scaled:center") + X_scaled %*% ridge_coefficients
   r2 <- calculate_R2(y , y_hat)

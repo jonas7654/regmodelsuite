@@ -11,7 +11,8 @@ vignette: >
 
 This vignette demonstrates how to estimate a LASSO regression model using the `regmodelsuite` package. LASSO is a type of linear regression that includes a penalty to shrink some coefficients to zero, effectively performing variable selection.
 
-
+We are going to use the Caschool dataset from the package \code{Ecdat}.
+Below we are splitting the dataset into a training set and test set.
 
 ```{r}
 library(Ecdat)
@@ -32,17 +33,19 @@ dim(training_set)
 dim(test_set)
 
 ```
-In order to estimate a lasso model the user can supply a formula into the regmodel function. We are going to use the amount of cyclinders, horsepower, weight and transmission type for predicting miles per gallon. The variables "cyl" and "am" will be included as dummy variables.
+To estimate a lasso model the user has to supply a formula into the regmodel function.
+We are going to use the amount of cyclinders, horsepower, weight and transmission type for predicting miles per gallon. The variables "cyl" and "am" will be included as dummy variables.
 First we are going to calculate value for lambda by using cross-validation
 
 ```{r}
 # seed for reproducebillity
 set.seed(2302)
-model_formula <- mathscr ~ .*.
+model_formula <- mathscr ~ as.factor(county)
 
-ridgeCV <- regmodel(model_formula, data = training_set, model = "ridge", cv = T)
+lassoCV <- regmodel(model_formula, data = training_set, model = "lasso", cv = T,
+                    nlambda = 5)
 
-min_lambda <- ridgeCV$min_lambda
+min_lambda <- lassoCV$min_lambda
 
 print(ridgeCV)
 

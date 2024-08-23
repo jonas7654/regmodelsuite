@@ -51,8 +51,8 @@ ridge_cv <- function(X, y, m, lambda = NULL, nlambda = 100) {
     # Segment data
     Indexes <- which(folds==i,arr.ind=TRUE)
 
-    testData <- X[Indexes,]
-    trainData <- X[-Indexes,]
+    testData <- X[Indexes, , drop = FALSE]
+    trainData <- X[-Indexes, , drop = FALSE]
 
     ytestData <- y[Indexes]
     ytrainData <- y[-Indexes]

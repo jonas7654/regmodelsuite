@@ -136,7 +136,6 @@
 regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
                      cv = FALSE, m = 10, nlambda = 100, n_predictors = NULL,
                      model_fct = lm, verbose = TRUE) {
-
   # Input checks
   stopifnot("Please provide a valid formula object" =
               !is.null(formula) && inherits(formula, "formula")
@@ -192,9 +191,9 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
               = model != "backward" || nrow(X) > ncol(X))
   }
 
-  if (!is.null(data)) {
+
     stopifnot("data must be of type data.frame" = is.data.frame(data))
-  }
+
 
 
   ########################################################################
@@ -216,6 +215,7 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
 
   #  names(data) <- var_names
   #}
+
 
   # Create model frame
   formula_without_intercept <- as.formula(paste(deparse(formula) , "+ 0"))
@@ -240,6 +240,14 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   X <- X[complete_rows , , drop = FALSE]
   y <- y[complete_rows]
 
+  # Check for zero variance if ridge, lasso or LAR
+  zero_var_cols <- apply(X, 2, function(x) var(x) == 0)
+  X <- X[ , !zero_var_cols, drop = FALSE]
+
+  if(sum(zero_var_cols) > 0) {
+    warning("some variables have zero variance and were dropped from estimation")
+  }
+
 
 
   # This is probably not needed anymore since X[, , drop = FALSE] is set
@@ -262,11 +270,11 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   if (model == "ridge") {
     if (cv) {
       if (!is.null(lambda)) {
-        cv_results <- ridge_cv(X, y, m = 10, nlambda = length(lambda), lambda = lambda)
+        cv_results <- ridge_cv(X, y, m = m, nlambda = length(lambda), lambda = lambda)
         results <- cv_results
       }
       else {
-        cv_results <- ridge_cv(X, y, m = 10, nlambda = nlambda)
+        cv_results <- ridge_cv(X, y, m = m, nlambda = nlambda)
         results <- cv_results
       }
     }
@@ -288,11 +296,11 @@ regmodel <- function(formula = NULL, data = NULL, model = NULL, lambda = NULL,
   else if (model == "lasso") {
     if (cv) {
       if (!is.null(lambda)) {
-        cv_results <- lasso_cv(X, y, m = 10, nlambda = length(lambda), lambda = lambda)
+        cv_results <- lasso_cv(X, y, m = m, nlambda = length(lambda), lambda = lambda)
         results <- cv_results
       }
       else {
-        cv_results <- lasso_cv(X, y, m = 10, nlambda = nlambda)
+        cv_results <- lasso_cv(X, y, m = m, nlambda = nlambda)
         results <- cv_results
       }
     }

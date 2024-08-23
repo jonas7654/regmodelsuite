@@ -59,7 +59,6 @@ lasso_cv_calculation <- function(X, y, tol = 1e-07) {
 
 
 lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
-
   # --- Errors and Warnings --- #
   stopifnot("m has to be equal or less the amount of rows of X" = m <= nrow(X))
 
@@ -109,19 +108,22 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
 
   # Perform m-fold cross validation
   for(i in 1:m){
-    # Segment data
-    Indexes <- which(folds==i,arr.ind=TRUE)
 
-    testData <- X[Indexes, ]
-    trainData <- X[-Indexes, ]
+
+    browser()
+    # Segment data
+    Indexes <- which(folds==i, arr.ind=TRUE)
+
+    testData <- X[Indexes, , drop = FALSE]
+    trainData <- X[-Indexes, , drop = FALSE]
 
     ytestData <- y[Indexes]
     ytrainData <- y[-Indexes]
 
     #standardize
 
-    x_reg = scale(trainData) # standardize
-    y_reg = scale(ytrainData,scale = FALSE) # demean
+    x_reg <- scale(trainData) # standardize
+    y_reg <- scale(ytrainData,scale = FALSE) # demean
 
     # --- Perform LASSO Regression --- #
     # Funktionsfabrik
@@ -132,6 +134,9 @@ lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-07) {
     for (l in 1:nlambda) {
       beta[ , l] <- lasso_estimator(lambda[l])
     }
+
+    stopifnot("couldn't calculate coefficients. Data is probably poor conditioned"
+              = !is.nan(beta))
 
     # calculate predicted values on original scale
     # Get mean and sd from the training data X
