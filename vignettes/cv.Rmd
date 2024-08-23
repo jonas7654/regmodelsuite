@@ -137,7 +137,7 @@ plot(lasso_cv)
 You can also adjust the amount of folds used during cross validation. Generally, m = 5 or m = 10 is recommended. A higher m will lead to longer computation, which is why m = 10 is the default in our package. 
 
 ```{r}
-ridge_cv <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5),
+ridge_cv <- regmodel(formula = y ~ X1 + I(X1^3) + I(X1^5) + X4 + X5,
                 data = df,
                 model = "ridge",
                 cv = TRUE,

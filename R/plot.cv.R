@@ -31,13 +31,13 @@ plot.cv <- function(cvobj) {
   matplot(lambda_seq, t(coeff_seq),
           type = "l", lty = 1, col = 1:ncol(coeff_seq),
           xlab = "lambda", ylab = "geschätzte Parameter beta",
-          main = name, log = "x", xaxt = "n"
+          main = name, log = "x"
   )
 
   legend("topright", legend = 1:nrow(coeff_seq),col = 1:nrow(coeff_seq),
          cex=0.8,fill=1:nrow(coeff_seq))
 
-  axis(1, at = c(1e-3, 1e-1, 1e1, 1e3), labels = c("1e-3", "1e-1", "1e1", "1e3"))
+  #axis(1, at = c(1e-3, 1e-1, 1e1, 1e3), labels = c("1e-3", "1e-1", "1e1", "1e3"))
 
   abline(v = cvobj$min_lambda, col = "black", lty = 2)
 }
