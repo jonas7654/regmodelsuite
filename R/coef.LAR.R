@@ -10,7 +10,7 @@
 
 
 
-coef.LAR <- function(object, unscale = T) {
+coef.LAR <- function(object, unscale = FALSE) {
     stopifnot("object must be of type LAR" = inherits(object, "LAR"))
 
     betas <- object$coefficient[nrow(object$coefficients) , ]

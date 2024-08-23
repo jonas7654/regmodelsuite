@@ -2,60 +2,6 @@
 #' @importFrom utils setTxtProgressBar
 #' @importFrom stats lm.fit
 
-# This is just a helper function for a more efficient calculation
-lasso_cv_calculation <- function(X, y, tol = 1e-07) {
-
-  # Init
-  n <- nrow(X)
-  p <- ncol(X)
-
-  X_scaled <- X # X is already scaled
-  max_abs_beta_diff <- Inf
-  mean_X_scaled_squared <- mean(X_scaled^2)
-  m <- 0L
-
-  lasso_only_lambda <- function(lambda) {
-
-    if (lambda == 0) {
-      OLS <- lm.fit(X, y)$coefficients
-      if (ncol(X) >= nrow(X)) {
-        warning("The matrix X suffers from multicollinearity")
-      }
-      return(as.vector(OLS))
-    }
-
-    beta <- double(p)
-
-    while(max_abs_beta_diff > tol) {
-
-      beta_old <- beta
-      for (j in 1:p) {
-        # 1
-        r <- y - X_scaled[ , -j] %*% beta[-j]
-
-        # 2
-        beta_j_tilde <- mean(X_scaled[ , j] * r)
-
-        # 3
-        beta_j_next <- ifelse(j == 1, beta_j_tilde,
-                              (1 / (mean(X_scaled[ , j]^2))) *
-                                sign(beta_j_tilde) *
-                                max(0, (abs(beta_j_tilde) - (lambda/2)))
-        )
-        beta[j] <- beta_j_next
-
-      }
-
-      max_abs_beta_diff <- max(abs(beta_old - beta_old))
-      m <- m + 1
-
-    }
-    return(as.vector(beta))
-  }
-
-  return(lasso_only_lambda)
-}
-
 
 
 lasso_cv <- function(X, y, m, lambda = NULL, nlambda = 100, iter = 1e-06) {

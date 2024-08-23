@@ -1,0 +1,87 @@
+---
+title: "Least_angle_regression"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Least_angle_regression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This vignette demonstrates how to estimate a Least angle regression model 
+using the `regmodelsuite` package. 
+
+First we are going to create some example Data where the number of predictors
+is greater than the number of observations p >> n.
+In addition to that only a few variables are relevant in order to predict the
+population.
+
+```{r, setup}
+library(regmodelsuite)
+
+set.seed(1223)  # For reproducibility
+
+n <- 50    # Number of observations
+p <- 200   # Number of predictors
+
+X <- matrix(rnorm(n*p), nrow=n, ncol=p)
+
+beta <- c(rep(2, 5), rep(0, p-5))  # Only the first 5 predictors are relevant
+
+y <- X %*% beta + rnorm(n)
+
+df <- data.frame(y,X)
+
+dim(df)
+```
+
+
+To estimate a least angle regression model the user has to supply a formula into
+the regmodel function. We are going to add all p predictors.
+By using the \code{coef} function, the coefficients can be easily extracted and
+transformed back to the unscaled coefficients.
+
+```{r}
+# seed for reproducebillity
+set.seed(23025)
+model_formula <- y ~ .
+fit_LAR <- regmodel(model_formula, data = df, model = "LAR")
+
+print(fit_LAR)
+
+
+cat("Scaled:", coef(fit_LAR, unscale = ))
+cat("Unscaled", coef(fit_LAR, unscale = T))
+
+
+```
+It is possible to use this regression object to predict the response variable.
+Here we assume that we receive a new sample from the same population.
+The plot below shows the response variable \code{y} and the red triangles depict the
+predicted values
+```{r}
+set.seed(555)
+
+# Parameters
+n <- 50  # Number of observations
+p <- 200  # Number of predictors
+
+# Generate predictor matrix (X) with normal distributed values
+X <- as.data.frame(matrix(rnorm(n * p), nrow = n, ncol = p))
+
+
+# Predicting
+pred <- predict(fit_LAR, newdata = X)
+pred
+
+{plot(df$y); points(pred, col = "red",pch = 2)}
+```
+

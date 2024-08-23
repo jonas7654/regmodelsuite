@@ -4,10 +4,13 @@
 \alias{coef.lasso}
 \title{Extract coefficients from an estimated least angle regression model}
 \usage{
-\method{coef}{lasso}(object)
+\method{coef}{lasso}(object, unscale = FALSE)
 }
 \arguments{
 \item{object}{A LAR S3 Object}
+
+\item{unscale}{If TRUE, the coefficients will be scaled back to the original
+scale}
 }
 \value{
 LAR coefficients from regobject
