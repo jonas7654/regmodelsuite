@@ -9,11 +9,10 @@
 Implements Ridge, Lasso, Forward selection, Backward selection and Least angle regression and also offers m-fold Cross Validation.
 }
 \author{
-\strong{Maintainer}: 
+\strong{Maintainer}: Jonas Veit \email{mee322@uni-heidelberg.com}
 
 Authors:
 \itemize{
-  \item Jonas Veit \email{mee322@uni-heidelberg.com}
   \item Pitt Junker \email{pitt.junker@stud.uni-heidelberg.com}
 }
 

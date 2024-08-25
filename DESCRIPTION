@@ -2,7 +2,7 @@ Package: regmodelsuite
 Title: Estimate regression models
 Version: 0.0.0.9000
 Authors@R: 
-    c(person("Jonas", "Veit", , "mee322@uni-heidelberg.com", role = c("aut")),
+    c(person("Jonas", "Veit", , "mee322@uni-heidelberg.com", role = c("cre", "aut")),
     person("Pitt", "Junker", , "pitt.junker@stud.uni-heidelberg.com", role = c("aut"))
     )
 Description: Implements Ridge, Lasso, Forward selection, Backward selection and 
